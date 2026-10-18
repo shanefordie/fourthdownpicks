@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Fourth Down Picks</title>
+<style>
+:root{--bg:#070b14;--panel:#111827;--panel2:#182235;--line:#29354c;--text:#f8fafc;--muted:#94a3b8;--accent:#34d399;--blue:#60a5fa;--gold:#fbbf24}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% -10%,#1d2a45 0,#070b14 42%);color:var(--text);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
+header{max-width:1100px;margin:auto;padding:26px 18px 12px}.eyebrow{font-size:12px;font-weight:900;letter-spacing:.18em;color:var(--accent)}h1{font-size:36px;line-height:1;margin:7px 0}.sub{color:var(--muted);font-size:14px}
+.wrap{max-width:1100px;margin:auto;padding:0 18px 50px}.top{display:flex;gap:9px;flex-wrap:wrap;margin:18px 0}.control{background:var(--panel);border:1px solid var(--line);color:var(--text);padding:11px 13px;border-radius:11px;font-weight:800}.save{background:var(--accent);color:#032319;border-color:var(--accent);cursor:pointer}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:16px}@media(max-width:800px){.grid{grid-template-columns:1fr}h1{font-size:30px}}
+.card{background:rgba(17,24,39,.96);border:1px solid var(--line);border-radius:17px;overflow:hidden;box-shadow:0 12px 40px #0005}.cardhead{padding:17px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.cardhead h2{margin:0;font-size:17px}.pill{font-size:11px;padding:6px 9px;border-radius:999px;background:var(--panel2);color:var(--muted);font-weight:900}
+.game{padding:14px 16px;border-bottom:1px solid var(--line)}.game:last-child{border-bottom:0}.time{font-size:11px;color:var(--muted);margin-bottom:10px}.teams{display:grid;grid-template-columns:1fr 30px 1fr;gap:8px;align-items:center}
+.team{border:1px solid var(--line);background:#0d1524;color:var(--text);border-radius:13px;padding:12px 11px;cursor:pointer;min-height:68px}.team:hover{border-color:#64748b}.team.selected{border-color:var(--accent);background:#10352d;box-shadow:0 0 0 2px #34d39922}.team.home{text-align:right}.abbr{font-size:11px;color:var(--muted);font-weight:900}.name{font-weight:900;font-size:14px;margin-top:2px}.at{text-align:center;color:var(--muted);font-size:11px}.lock{font-size:10px;color:var(--muted);margin-top:8px}
+.side-section{padding:16px;border-bottom:1px solid var(--line)}.side-section:last-child{border-bottom:0}.side-title{font-size:13px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.08em;margin-bottom:11px}
+.player{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}.player:last-child{border:0}.pname{font-weight:850}.score{font-weight:950}.medal{width:23px;display:inline-block;color:var(--gold)}.small{font-size:11px;color:var(--muted)}.notice{padding:12px;border-radius:11px;background:#0d1524;color:var(--muted);font-size:12px;line-height:1.5}
+.progress{height:7px;background:#243047;border-radius:99px;overflow:hidden;margin-top:10px}.progress>div{height:100%;background:var(--accent);width:0}
+.row{display:flex;gap:8px}.row input{flex:1;min-width:0;background:#0d1524;border:1px solid var(--line);color:var(--text);padding:10px;border-radius:9px}.row button{background:var(--blue);border:0;border-radius:9px;padding:0 12px;font-weight:900;cursor:pointer}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#f8fafc;color:#07101c;padding:10px 15px;border-radius:10px;font-weight:900;display:none;z-index:5}
+</style>
+</head>
+<body>
+<header>
+<div class="eyebrow">FOURTH DOWN PICKS</div>
+<h1>Pick. Compete. Win.</h1>
+<div class="sub">Your group's weekly NFL prediction league.</div>
+</header>
+<div class="wrap">
+<div class="top">
+<select id="player" class="control"></select>
+<select id="week" class="control"></select>
+<button id="save" class="control save">Save Picks</button>
+<button id="refresh" class="control">Refresh</button>
+</div>
+<div class="grid">
+<main class="card">
+<div class="cardhead"><h2 id="weekTitle">Loading…</h2><span class="pill" id="picked">0 / 0 picked</span></div>
+<div id="games"></div>
+</main>
+<aside class="card">
+<div class="side-section">
+<div class="side-title">Leaderboard</div>
+<div id="leaderboard"></div>
+</div>
+<div class="side-section">
+<div class="side-title">League Setup</div>
+<div class="notice">This version keeps the four players separate. Add your names below, then each person selects their name before making picks.</div>
+<div style="height:10px"></div>
+<div class="row"><input id="newName" placeholder="Player name"><button id="add">Add</button></div>
+</div>
+<div class="side-section">
+<div class="side-title">Your progress</div>
+<div id="progressText" class="small">No picks yet</div>
+<div class="progress"><div id="progress"></div></div>
+</div>
+</aside>
+</div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const DEFAULT_PLAYERS=["Shane","Friend 2","Friend 3","Friend 4"];
+let players=JSON.parse(localStorage.getItem("fdPlayers")||"null")||DEFAULT_PLAYERS;
+let picks=JSON.parse(localStorage.getItem("fdPicks")||"{}");
+let events=[];
+const $=x=>document.getElementById(x);
+function toast(t){$("toast").textContent=t;$("toast").style.display="block";setTimeout(()=>$("toast").style.display="none",1600)}
+function save(){localStorage.setItem("fdPlayers",JSON.stringify(players));localStorage.setItem("fdPicks",JSON.stringify(picks))}
+function weekNo(date){
+ const start=new Date("2026-09-09T00:00:00Z"),d=new Date(date);
+ return Math.max(1,Math.floor((d-start)/604800000)+1)
+}
+function fmt(x){return new Intl.DateTimeFormat("en-US",{weekday:"short",month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}).format(new Date(x))}
+function teams(e){let c=e.competitions[0];return {a:c.competitors.find(x=>x.homeAway==="away"),h:c.competitors.find(x=>x.homeAway==="home")}}
+function populatePlayers(){
+ $("player").innerHTML=players.map(p=>`<option>${escapeHtml(p)}</option>`).join("");
+ $("player").value=localStorage.getItem("fdCurrent")||players[0];
+}
+function escapeHtml(s){return s.replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+async function load(){
+ $("games").innerHTML="<div style='padding:22px;color:#94a3b8'>Loading the 2026 NFL schedule…</div>";
+ try{
+  let r=await fetch("https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?dates=2026&seasontype=2&limit=500");
+  let d=await r.json();events=(d.events||[]).filter(e=>e.competitions?.[0]?.competitors?.length===2);
+  let ws=[...new Set(events.map(e=>weekNo(e.date)))].sort((a,b)=>a-b);
+  $("week").innerHTML=ws.map(w=>`<option value="${w}">Week ${w}</option>`).join("");
+  let saved=+$("week").value||weekNo(new Date());$("week").value=ws.includes(saved)?saved:ws[0];
+  render();
+ }catch(e){$("games").innerHTML="<div style='padding:22px'>Schedule could not be loaded. Press Refresh.</div>"}
+}
+function render(){
+ let player=$("player").value,w=+$("week").value;
+ let gs=events.filter(e=>weekNo(e.date)===w).sort((a,b)=>new Date(a.date)-new Date(b.date));
+ $("weekTitle").textContent=`Week ${w}`;
+ let count=0;
+ $("games").innerHTML=gs.map(e=>{
+  let t=teams(e),pick=picks[player]?.[e.id],done=e.status?.type?.completed;
+  if(pick)count++;
+  return `<div class="game"><div class="time">${fmt(e.date)} · ${e.status?.type?.shortDetail||""}</div>
+  <div class="teams">
+   <button class="team ${pick===t.a.id?"selected":""}" ${done?"disabled":""} onclick="choose('${e.id}','${t.a.id}')"><div class="abbr">${t.a.abbreviation}</div><div class="name">${t.a.team.displayName}</div></button>
+   <div class="at">@</div>
+   <button class="team home ${pick===t.h.id?"selected":""}" ${done?"disabled":""} onclick="choose('${e.id}','${t.h.id}')"><div class="abbr">${t.h.abbreviation}</div><div class="name">${t.h.team.displayName}</div></button>
+  </div><div class="lock">${done?"🔒 Final · pick locked":pick?"✓ Pick saved":"Tap a team to pick the winner"}</div></div>`;
+ }).join("")||"<div style='padding:22px;color:#94a3b8'>No games this week.";
+ $("picked").textContent=`${count} / ${gs.length} picked`;
+ updateBoard();
+}
+window.choose=(id,team)=>{
+ let p=$("player").value;
+ let ev=events.find(e=>e.id===id);if(ev?.status?.type?.completed)return;
+ picks[p]??={};picks[p][id]=team;save();render();toast("Pick saved");
+}
+function updateBoard(){
+ let rows=players.map(p=>{
+  let correct=0,total=0;
+  events.forEach(e=>{let win=e.competitions[0].competitors.find(x=>x.winner)?.id,pk=picks[p]?.[e.id];if(win&&pk){total++;if(win===pk)correct++}});
+  return {p,correct,total}
+ }).sort((a,b)=>b.correct-a.correct);
+ $("leaderboard").innerHTML=rows.map((x,i)=>`<div class="player"><span><span class="medal">${i===0?"★":(i+1)+"."}</span><span class="pname">${escapeHtml(x.p)}</span></span><span class="score">${x.correct} <span class="small">correct</span></span></div>`).join("");
+ let me=rows.find(x=>x.p===$("player").value)||{correct:0,total:0};
+ $("progressText").textContent=`${me.correct} correct out of ${me.total} graded picks`;
+ $("progress").style.width=(me.total?me.correct/me.total*100:0)+"%";
+}
+$("player").onchange=()=>{localStorage.setItem("fdCurrent",$("player").value);render()};
+$("week").onchange=render;$("refresh").onclick=load;
+$("save").onclick=()=>{save();toast("All picks saved on this device")};
+$("add").onclick=()=>{let n=$("newName").value.trim();if(!n||players.includes(n))return;players.push(n);$("newName").value="";save();populatePlayers();$("player").value=n;render();toast(n+" added")};
+populatePlayers();load();
+</script>
+</body>
+</html>
