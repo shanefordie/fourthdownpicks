@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fourth Down Picks</title>
+<style>
+:root{--bg:#070b14;--panel:#111827;--line:#29354c;--text:#f8fafc;--muted:#94a3b8;--accent:#34d399;--blue:#60a5fa}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% -10%,#1d2a45,#070b14 45%);color:var(--text);font-family:system-ui,-apple-system,sans-serif}
+header,.wrap{max-width:1100px;margin:auto;padding-left:18px;padding-right:18px}header{padding-top:26px}.eyebrow{font-size:12px;font-weight:900;letter-spacing:.18em;color:var(--accent)}h1{font-size:36px;margin:7px 0}.sub{color:var(--muted)}
+.top{display:flex;gap:9px;flex-wrap:wrap;margin:18px 0}.control{background:var(--panel);border:1px solid var(--line);color:var(--text);padding:11px 13px;border-radius:11px;font-weight:800}.save{background:var(--accent);color:#032319}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px}@media(max-width:800px){.grid{grid-template-columns:1fr}h1{font-size:30px}}
+.card{background:#111827f5;border:1px solid var(--line);border-radius:17px;overflow:hidden}.head{padding:17px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between}.head h2{margin:0;font-size:17px}.pill{font-size:11px;padding:6px 9px;border-radius:999px;background:#182235;color:var(--muted);font-weight:900}
+.game{padding:14px 16px;border-bottom:1px solid var(--line)}.time{font-size:11px;color:var(--muted);margin-bottom:10px}.teams{display:grid;grid-template-columns:1fr 30px 1fr;gap:8px;align-items:center}.team{border:1px solid var(--line);background:#0d1524;color:var(--text);border-radius:13px;padding:12px 11px;cursor:pointer;min-height:68px}.team:disabled{cursor:not-allowed;opacity:.62}.selected{border-color:var(--accent)!important;background:#10352d!important}.home{text-align:right}.abbr{font-size:11px;color:var(--muted);font-weight:900}.name{font-weight:900;font-size:14px}.at{text-align:center;color:var(--muted)}.lock{font-size:10px;color:var(--muted);margin-top:8px}
+.side{padding:16px}.sideTitle{font-size:13px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}.section{padding-bottom:16px;margin-bottom:16px;border-bottom:1px solid var(--line)}.player{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line)}.pname{font-weight:850}.small{font-size:11px;color:var(--muted)}.notice{padding:12px;border-radius:11px;background:#0d1524;color:var(--muted);font-size:12px;line-height:1.5}.row{display:flex;gap:8px;margin-top:10px}.row input{flex:1;background:#0d1524;border:1px solid var(--line);color:white;padding:10px;border-radius:9px}.row button,.remove{border:0;border-radius:9px;padding:8px 10px;font-weight:900}.row button{background:var(--blue)}.remove{background:transparent;border:1px solid var(--line);color:var(--muted)}.progress{height:7px;background:#243047;border-radius:99px;overflow:hidden;margin-top:10px}.progress div{height:100%;background:var(--accent);width:0}.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:white;color:#07101c;padding:10px 15px;border-radius:10px;font-weight:900;display:none}
+</style>
+</head>
+<body>
+<header><div class="eyebrow">FOURTH DOWN PICKS</div><h1>Pick. Compete. Win.</h1><div class="sub">Your group's weekly NFL prediction league.</div></header>
+<div class="wrap">
+<div class="top"><select id="player" class="control"></select><select id="week" class="control"></select><button id="save" class="control save">Save Picks</button><button id="refresh" class="control">Refresh</button></div>
+<div class="grid"><main class="card"><div class="head"><h2 id="weekTitle">Loading…</h2><span class="pill" id="picked">0 / 0 picked</span></div><div id="games"></div></main>
+<aside class="card side"><div class="section"><div class="sideTitle">Leaderboard</div><div id="leaderboard"></div></div>
+<div class="section"><div class="sideTitle">Players (2–6)</div><div class="notice">Add up to 6 players. Names are adjustable. Removing a player removes their saved picks on this device.</div><div id="playerList"></div><div class="row"><input id="newName" placeholder="Add player"><button id="add">Add</button></div></div>
+<div><div class="sideTitle">Your progress</div><div id="progressText" class="small">No graded picks yet</div><div class="progress"><div id="progress"></div></div></div></aside></div></div>
+<div id="toast" class="toast"></div>
+<script>
+const DEFAULT_PLAYERS=["Shane","Friend 2","Friend 3","Friend 4"];
+let players=JSON.parse(localStorage.getItem("fdPlayers")||"null")||DEFAULT_PLAYERS;
+let picks=JSON.parse(localStorage.getItem("fdPicks")||"{}"),events=[];
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+function persist(){localStorage.setItem("fdPlayers",JSON.stringify(players));localStorage.setItem("fdPicks",JSON.stringify(picks))}
+function toast(s){$("toast").textContent=s;$("toast").style.display="block";setTimeout(()=>$("toast").style.display="none",1500)}
+function weekNo(date){const start=new Date("2026-09-09T00:00:00"),d=new Date(date);return Math.max(1,Math.floor((d-start)/604800000)+1)}
+function fmt(x){return new Intl.DateTimeFormat("en-US",{weekday:"short",month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}).format(new Date(x))}
+function teams(e){const c=e.competitions[0];return{a:c.competitors.find(x=>x.homeAway==="away"),h:c.competitors.find(x=>x.homeAway==="home")}}
+function locked(e){return !!e.status?.type?.completed||new Date(e.date)<=new Date()}
+function populatePlayers(){const current=localStorage.getItem("fdCurrent")||players[0];$("player").innerHTML=players.map(p=>`<option value="${esc(p)}">${esc(p)}</option>`).join("");$("player").value=players.includes(current)?current:players[0];renderPlayerList()}
+async function load(){
+ $("games").innerHTML="<div style='padding:22px;color:#94a3b8'>Loading the 2026 NFL schedule…</div>";
+ try{
+  const r=await fetch("https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?dates=2026&seasontype=2&limit=500");
+  const d=await r.json();events=d.events||[];
+  const ws=[...new Set(events.map(e=>weekNo(e.date)))].sort((a,b)=>a-b);
+  $("week").innerHTML=ws.map(w=>`<option value="${w}">Week ${w}</option>`).join("");
+  const current=Math.max(1,Math.min(18,weekNo(new Date())));
+  $("week").value=ws.includes(current)?current:ws[0];render();
+ }catch(e){$("games").innerHTML="<div style='padding:22px'>Schedule could not be loaded. Press Refresh.</div>"}
+}
+function render(){
+ const p=$("player").value,w=+$("week").value;
+ const gs=events.filter(e=>weekNo(e.date)===w).sort((a,b)=>new Date(a.date)-new Date(b.date));
+ let count=0;$("weekTitle").textContent=`Week ${w}`;
+ $("games").innerHTML=gs.map(e=>{
+  const t=teams(e),pk=picks[p]?.[e.id],isLocked=locked(e);if(pk)count++;
+  return `<div class="game"><div class="time">${fmt(e.date)} · ${e.status?.type?.shortDetail||""}</div><div class="teams">
+  <button class="team ${pk===t.a.id?"selected":""}" ${isLocked?"disabled":""} onclick="choose('${e.id}','${t.a.id}')"><div class="abbr">${esc(t.a.abbreviation||"")}</div><div class="name">${esc(t.a.team.displayName)}</div></button>
+  <div class="at">@</div><button class="team home ${pk===t.h.id?"selected":""}" ${isLocked?"disabled":""} onclick="choose('${e.id}','${t.h.id}')"><div class="abbr">${esc(t.h.abbreviation||"")}</div><div class="name">${esc(t.h.team.displayName)}</div></button>
+  </div><div class="lock">${isLocked?"🔒 Game started/final · picks locked":pk?"✓ Pick saved":"Tap a team to pick the winner"}</div></div>`
+ }).join("")||"<div style='padding:22px;color:#94a3b8'>No games this week.</div>";
+ $("picked").textContent=`${count} / ${gs.length} picked`;updateBoard();
+}
+window.choose=(id,team)=>{const e=events.find(x=>x.id===id);if(!e||locked(e))return;const p=$("player").value;picks[p]??={};picks[p][id]=team;persist();render();toast("Pick saved")};
+function updateBoard(){
+ const rows=players.map(p=>{let c=0,t=0;events.forEach(e=>{const win=e.competitions?.[0]?.competitors?.find(x=>x.winner)?.id,pk=picks[p]?.[e.id];if(win&&pk){t++;if(win===pk)c++}});return{p,c,t}}).sort((a,b)=>b.c-a.c);
+ $("leaderboard").innerHTML=rows.map((x,i)=>`<div class="player"><span><span class="small">${i+1}.</span> <span class="pname">${esc(x.p)}</span></span><b>${x.c}<span class="small"> / ${x.t}</span></b></div>`).join("");
+ const me=rows.find(x=>x.p===$("player").value)||{c:0,t:0};$("progressText").textContent=`${me.c} correct out of ${me.t} graded picks`;$("progress").style.width=(me.t?me.c/me.t*100:0)+"%";renderPlayerList();
+}
+function renderPlayerList(){$("playerList").innerHTML=players.map((p,i)=>`<div class="player"><span class="pname">${esc(p)}</span>${players.length>2?`<button class="remove" onclick="removePlayer(${i})">Remove</button>`:""}</div>`).join("")}
+window.removePlayer=i=>{if(players.length<=2)return;const p=players[i];if(!confirm("Remove "+p+"?"))return;players.splice(i,1);delete picks[p];persist();populatePlayers();render();toast("Player removed")};
+$("add").onclick=()=>{if(players.length>=6)return toast("Maximum 6 players");const n=$("newName").value.trim();if(!n||players.includes(n))return toast("Enter a unique name");players.push(n);$("newName").value="";persist();populatePlayers();$("player").value=n;localStorage.setItem("fdCurrent",n);render();toast(n+" added")};
+$("player").onchange=()=>{localStorage.setItem("fdCurrent",$("player").value);render()};$("week").onchange=render;$("refresh").onclick=load;$("save").onclick=()=>{persist();toast("Picks saved")};
+populatePlayers();load();
+</script>
+</body>
+</html>
