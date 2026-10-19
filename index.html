@@ -24,7 +24,12 @@ header,.wrap{max-width:1100px;margin:auto;padding-left:18px;padding-right:18px}h
 <div class="section"><div class="sideTitle">Players (2–6)</div><div class="notice">Add up to 6 players. Names are adjustable. Removing a player removes their saved picks on this device.</div><div id="playerList"></div><div class="row"><input id="newName" placeholder="Add player"><button id="add">Add</button></div></div>
 <div><div class="sideTitle">Your progress</div><div id="progressText" class="small">No graded picks yet</div><div class="progress"><div id="progress"></div></div></div></aside></div></div>
 <div id="toast" class="toast"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+const sb = window.supabase.createClient(
+  "YOUR_PROJECT_URL",
+  "YOUR_PUBLISHABLE_KEY"
+);
 const DEFAULT_PLAYERS=["Shane","Friend 2","Friend 3","Friend 4"];
 let players=JSON.parse(localStorage.getItem("fdPlayers")||"null")||DEFAULT_PLAYERS;
 let picks=JSON.parse(localStorage.getItem("fdPicks")||"{}"),events=[];
