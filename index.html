@@ -24,6 +24,7 @@ header,.wrap{max-width:1100px;margin:auto;padding-left:18px;padding-right:18px}h
   <button id="signUp">Create Account</button>
   <p id="authMessage"></p>
 </div>
+<div id="appContent" style="display:none">
 <header><div class="eyebrow">FOURTH DOWN PICKS</div><h1>Pick. Compete. Win.</h1><div class="sub">Your group's weekly NFL prediction league.</div></header>
 <div class="wrap">
 <div class="top"><select id="player" class="control"></select><select id="week" class="control"></select><button id="save" class="control save">Save Picks</button><button id="refresh" class="control">Refresh</button></div>
@@ -32,6 +33,7 @@ header,.wrap{max-width:1100px;margin:auto;padding-left:18px;padding-right:18px}h
 <div class="section"><div class="sideTitle">Players (2–6)</div><div class="notice">Add up to 6 players. Names are adjustable. Removing a player removes their saved picks on this device.</div><div id="playerList"></div><div class="row"><input id="newName" placeholder="Add player"><button id="add">Add</button></div></div>
 <div><div class="sideTitle">Your progress</div><div id="progressText" class="small">No graded picks yet</div><div class="progress"><div id="progress"></div></div></div></aside></div></div>
 <div id="toast" class="toast"></div>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const sb = window.supabase.createClient(
@@ -102,6 +104,18 @@ $("signIn").onclick = async () => {
     ? error.message
     : "Signed in! Refresh the page to continue.";
 };
+async function updateAuthUI() {
+  const { data: { session } } = await sb.auth.getSession();
+
+  $("authBox").style.display = session ? "none" : "block";
+  $("appContent").style.display = session ? "block" : "none";
+}
+
+sb.auth.onAuthStateChange(() => {
+  updateAuthUI();
+});
+
+updateAuthUI();
 </script>
 </body>
 </html>
