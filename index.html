@@ -16,6 +16,14 @@ header,.wrap{max-width:1100px;margin:auto;padding-left:18px;padding-right:18px}h
 </style>
 </head>
 <body>
+  <div id="authBox" style="max-width:400px;margin:40px auto;padding:24px;background:#111827;border-radius:12px;color:white">
+  <h2>Fourth Down Picks</h2>
+  <input id="email" type="email" placeholder="Email" style="display:block;width:100%;padding:12px;margin:10px 0">
+  <input id="password" type="password" placeholder="Password" style="display:block;width:100%;padding:12px;margin:10px 0">
+  <button id="signIn">Sign In</button>
+  <button id="signUp">Create Account</button>
+  <p id="authMessage"></p>
+</div>
 <header><div class="eyebrow">FOURTH DOWN PICKS</div><h1>Pick. Compete. Win.</h1><div class="sub">Your group's weekly NFL prediction league.</div></header>
 <div class="wrap">
 <div class="top"><select id="player" class="control"></select><select id="week" class="control"></select><button id="save" class="control save">Save Picks</button><button id="refresh" class="control">Refresh</button></div>
@@ -77,6 +85,23 @@ window.removePlayer=i=>{if(players.length<=2)return;const p=players[i];if(!confi
 $("add").onclick=()=>{if(players.length>=6)return toast("Maximum 6 players");const n=$("newName").value.trim();if(!n||players.includes(n))return toast("Enter a unique name");players.push(n);$("newName").value="";persist();populatePlayers();$("player").value=n;localStorage.setItem("fdCurrent",n);render();toast(n+" added")};
 $("player").onchange=()=>{localStorage.setItem("fdCurrent",$("player").value);render()};$("week").onchange=render;$("refresh").onclick=load;$("save").onclick=()=>{persist();toast("Picks saved")};
 populatePlayers();load();
+$("signUp").onclick = async () => {
+  const email = $("email").value.trim();
+  const password = $("password").value;
+  const { error } = await sb.auth.signUp({ email, password });
+  $("authMessage").textContent = error
+    ? error.message
+    : "Account created! Check your email if confirmation is required.";
+};
+
+$("signIn").onclick = async () => {
+  const email = $("email").value.trim();
+  const password = $("password").value;
+  const { error } = await sb.auth.signInWithPassword({ email, password });
+  $("authMessage").textContent = error
+    ? error.message
+    : "Signed in! Refresh the page to continue.";
+};
 </script>
 </body>
 </html>
