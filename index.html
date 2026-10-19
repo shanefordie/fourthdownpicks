@@ -108,7 +108,7 @@ async function updateAuthUI() {
   const { data: { session } } = await sb.auth.getSession();
 
   $("authBox").style.display = session ? "none" : "block";
-  $("appContent").style.display = session ? "block" : "none";
+$("appContent").style.setProperty("display", session ? "block" : "none", "important");
 }
 
 sb.auth.onAuthStateChange(() => {
