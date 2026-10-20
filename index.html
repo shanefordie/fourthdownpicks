@@ -161,7 +161,7 @@ window.choose = async (id, team) => {
     toast("Pick saved!");
   } catch (err) {
     console.error("Pick save failed:", err);
-    toast("Couldn't save pick to database");
+toast("Save failed: " + (err.message || String(err)));
   }
 };
 
