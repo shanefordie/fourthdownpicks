@@ -91,7 +91,10 @@ async function load(){
 const d=await r.json();
 events=d.events||[];
 
-await syncGamesToDatabase();
+await syncGamesToDatabase().catch(e => {
+  console.error("Game sync failed:", e);
+  toast("Database sync failed. Check console.");
+});
   const ws=[...new Set(events.map(e=>weekNo(e.date)))].sort((a,b)=>a-b);
   $("week").innerHTML=ws.map(w=>`<option value="${w}">Week ${w}</option>`).join("");
   const current=Math.max(1,Math.min(18,weekNo(new Date())));
