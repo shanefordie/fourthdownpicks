@@ -41,7 +41,7 @@ const sb = window.supabase.createClient(
   "sb_publishable_jS3BWAuUZAOEcE30GVy7eg_b4cWL8Iu"
 );
 const DEFAULT_PLAYERS=["Shane","Friend 2","Friend 3","Friend 4"];
-let players=JSON.parse(localStorage.getItem("fdPlayers")||"null")||DEFAULT_PLAYERS;
+let players=DEFAULT_PLAYERS;
 let picks=JSON.parse(localStorage.getItem("fdPicks")||"{}"),events=[];
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
