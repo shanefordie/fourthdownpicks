@@ -45,7 +45,10 @@ let players=DEFAULT_PLAYERS;
 let picks=JSON.parse(localStorage.getItem("fdPicks")||"{}"),events=[];
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
-function persist(){localStorage.setItem("fdPlayers",JSON.stringify(players));localStorage.setItem("fdPicks",JSON.stringify(picks))}
+async function persist(){
+  localStorage.setItem("fdPlayers",JSON.stringify(players));
+  localStorage.setItem("fdPicks",JSON.stringify(picks));
+}
 function toast(s){$("toast").textContent=s;$("toast").style.display="block";setTimeout(()=>$("toast").style.display="none",1500)}
 function weekNo(date){const start=new Date("2026-09-09T00:00:00"),d=new Date(date);return Math.max(1,Math.floor((d-start)/604800000)+1)}
 function fmt(x){return new Intl.DateTimeFormat("en-US",{weekday:"short",month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}).format(new Date(x))}
