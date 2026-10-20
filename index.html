@@ -91,9 +91,9 @@ async function load(){
 const d=await r.json();
 events=d.events||[];
 
-await syncGamesToDatabase().catch(e => {
+syncGamesToDatabase().catch(e => {
   console.error("Game sync failed:", e);
-  toast("Database sync failed. Check console.");
+  toast("Database sync failed");
 });
   const ws=[...new Set(events.map(e=>weekNo(e.date)))].sort((a,b)=>a-b);
   $("week").innerHTML=ws.map(w=>`<option value="${w}">Week ${w}</option>`).join("");
