@@ -88,7 +88,10 @@ async function load(){
  $("games").innerHTML="<div style='padding:22px;color:#94a3b8'>Loading the 2026 NFL schedule…</div>";
  try{
   const r=await fetch("https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?dates=2026&seasontype=2&limit=500");
-  const d=await r.json();events=d.events||[];
+const d=await r.json();
+events=d.events||[];
+
+await syncGamesToDatabase();
   const ws=[...new Set(events.map(e=>weekNo(e.date)))].sort((a,b)=>a-b);
   $("week").innerHTML=ws.map(w=>`<option value="${w}">Week ${w}</option>`).join("");
   const current=Math.max(1,Math.min(18,weekNo(new Date())));
