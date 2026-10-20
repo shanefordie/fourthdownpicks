@@ -114,7 +114,57 @@ function render(){
  }).join("")||"<div style='padding:22px;color:#94a3b8'>No games this week.</div>";
  $("picked").textContent=`${count} / ${gs.length} picked`;updateBoard();
 }
-window.choose=(id,team)=>{const e=events.find(x=>x.id===id);if(!e||locked(e))return;const p=$("player").value;picks[p]??={};picks[p][id]=team;persist();render();toast("Pick saved")};
+
+window.choose = async (id, team) => {
+  const e = events.find(x => x.id === id);
+  if (!e || locked(e)) return;
+
+  const p = $("player").value;
+  picks[p] ??= {};
+  picks[p][id] = team;
+
+  render();
+  toast("Saving pick...");
+
+  try {
+    const { data: { user }, error: userError } = await sb.auth.getUser();
+    if (userError) throw userError;
+    if (!user) throw new Error("Please sign in again.");
+
+    const { data: account, error: accountError } = await sb
+      .from("player_accounts")
+      .select("player_id")
+      .eq("user_id", user.id)
+      .single();
+
+    if (accountError) throw accountError;
+
+    const { data: game, error: gameError } = await sb
+      .from("games")
+      .select("id")
+      .eq("espn_event_id", id)
+      .single();
+
+    if (gameError) throw gameError;
+
+    const { error: pickError } = await sb
+      .from("picks")
+      .upsert({
+        player_id: account.player_id,
+        game_id: game.id,
+        selected_team: team
+      }, { onConflict: "player_id,game_id" });
+
+    if (pickError) throw pickError;
+
+    await persist();
+    toast("Pick saved!");
+  } catch (err) {
+    console.error("Pick save failed:", err);
+    toast("Couldn't save pick to database");
+  }
+};
+
 function updateBoard(){
  const rows=players.map(p=>{let c=0,t=0;events.forEach(e=>{const win=e.competitions?.[0]?.competitors?.find(x=>x.winner)?.id,pk=picks[p]?.[e.id];if(win&&pk){t++;if(win===pk)c++}});return{p,c,t}}).sort((a,b)=>b.c-a.c);
  $("leaderboard").innerHTML=rows.map((x,i)=>`<div class="player"><span><span class="small">${i+1}.</span> <span class="pname">${esc(x.p)}</span></span><b>${x.c}<span class="small"> / ${x.t}</span></b></div>`).join("");
