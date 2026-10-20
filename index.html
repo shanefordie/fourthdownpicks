@@ -71,13 +71,6 @@ function render(){
  const gs=events.filter(e=>weekNo(e.date)===w).sort((a,b)=>new Date(a.date)-new Date(b.date));
  let count=0;$("weekTitle").textContent=`Week ${w}`;
  $("games").innerHTML=gs.map(e=>{
-  const { data: dbPlayers, error: playerError } = await sb
-  .from("players")
-  .select("id, display_name")
-  .order("created_at");
-
-if (playerError) throw playerError;
-players = dbPlayers.map(p => p.display_name);
   const t=teams(e),pk=picks[p]?.[e.id],isLocked=locked(e);if(pk)count++;
   return `<div class="game"><div class="time">${fmt(e.date)} · ${e.status?.type?.shortDetail||""}</div><div class="teams">
   <button class="team ${pk===t.a.id?"selected":""}" ${isLocked?"disabled":""} onclick="choose('${e.id}','${t.a.id}')"><div class="abbr">${esc(t.a.abbreviation||"")}</div><div class="name">${esc(t.a.team.displayName)}</div></button>
