@@ -55,6 +55,35 @@ function fmt(x){return new Intl.DateTimeFormat("en-US",{weekday:"short",month:"s
 function teams(e){const c=e.competitions[0];return{a:c.competitors.find(x=>x.homeAway==="away"),h:c.competitors.find(x=>x.homeAway==="home")}}
 function locked(e){return !!e.status?.type?.completed||new Date(e.date)<=new Date()}
 function populatePlayers(){const current=localStorage.getItem("fdCurrent")||players[0];$("player").innerHTML=players.map(p=>`<option value="${esc(p)}">${esc(p)}</option>`).join("");$("player").value=players.includes(current)?current:players[0];renderPlayerList()}
+async function syncGamesToDatabase(){
+  const weekIds = {};
+
+  const { data: weeks, error: weekError } = await sb
+    .from("weeks")
+    .select("id, week_number");
+
+  if (weekError) throw weekError;
+
+  weeks.forEach(w => {
+    weekIds[w.week_number] = w.id;
+  });
+
+  for (const e of events) {
+    const w = weekNo(e.date);
+    const t = teams(e);
+    const { error } = await sb
+      .from("games")
+      .upsert({
+        espn_event_id: e.id,
+        week_id: weekIds[w],
+        home_team: t.h.team.displayName,
+        away_team: t.a.team.displayName,
+        kickoff_at: e.date
+      }, { onConflict: "espn_event_id" });
+
+    if (error) throw error;
+  }
+}
 async function load(){
  $("games").innerHTML="<div style='padding:22px;color:#94a3b8'>Loading the 2026 NFL schedule…</div>";
  try{
