@@ -190,8 +190,66 @@ function updateBoard(){
  const me=rows.find(x=>x.p===$("player").value)||{c:0,t:0};$("progressText").textContent=`${me.c} correct out of ${me.t} graded picks`;$("progress").style.width=(me.t?me.c/me.t*100:0)+"%";renderPlayerList();
 }
 function renderPlayerList(){$("playerList").innerHTML=players.map((p,i)=>`<div class="player"><span class="pname">${esc(p)}</span>${players.length>2?`<button class="remove" onclick="removePlayer(${i})">Remove</button>`:""}</div>`).join("")}
-window.removePlayer=i=>{if(players.length<=2)return;const p=players[i];if(!confirm("Remove "+p+"?"))return;players.splice(i,1);delete picks[p];persist();populatePlayers();render();toast("Player removed")};
-$("add").onclick=()=>{if(players.length>=6)return toast("Maximum 6 players");const n=$("newName").value.trim();if(!n||players.includes(n))return toast("Enter a unique name");players.push(n);$("newName").value="";persist();populatePlayers();$("player").value=n;localStorage.setItem("fdCurrent",n);render();toast(n+" added")};
+window.removePlayer=async i=>{
+  if(players.length<=2)return toast("Keep at least 2 players");
+
+  const p=players[i];
+  if(!confirm("Remove "+p+"?"))return;
+
+  const {data,error}=await sb
+    .from("players")
+    .select("id")
+    .eq("display_name",p)
+    .single();
+
+  if(error)return toast("Couldn't find player");
+
+  const {error:deleteError}=await sb
+    .from("players")
+    .delete()
+    .eq("id",data.id);
+
+  if(deleteError){
+    console.error(deleteError);
+    return toast("Couldn't remove player");
+  }
+
+  players.splice(i,1);
+  delete picks[p];
+  await persist();
+
+  populatePlayers();
+  render();
+  toast(p+" removed");
+};
+
+$("add").onclick=async()=>{
+  if(players.length>=6)return toast("Maximum 6 players");
+
+  const n=$("newName").value.trim();
+
+  if(!n||players.includes(n))
+    return toast("Enter a unique name");
+
+  const {error}=await sb
+    .from("players")
+    .insert({display_name:n});
+
+  if(error){
+    console.error(error);
+    return toast("Couldn't add player");
+  }
+
+  players.push(n);
+  $("newName").value="";
+  await persist();
+
+  populatePlayers();
+  $("player").value=n;
+  localStorage.setItem("fdCurrent",n);
+  render();
+  toast(n+" added");
+};
 $("player").onchange=()=>{localStorage.setItem("fdCurrent",$("player").value);render()};$("week").onchange=render;$("refresh").onclick=load;$("save").onclick=()=>{persist();toast("Picks saved")};
 loadPlayers()
   .then(()=>load())
