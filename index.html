@@ -62,6 +62,9 @@ async function loadPlayers(){
   }
 
   localStorage.setItem("fdPlayers",JSON.stringify(players));
+  
+  populatePlayers();
+  
 }
 
 async function persist(){
