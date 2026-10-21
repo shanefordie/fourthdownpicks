@@ -497,11 +497,65 @@ toast("Save failed: " + (err.message || String(err)));
   }
 };
 
+
 function updateBoard(){
- const rows=players.map(p=>{let c=0,t=0;events.forEach(e=>{const win=e.competitions?.[0]?.competitors?.find(x=>x.winner)?.id,pk=picks[p]?.[e.id];if(win&&pk){t++;if(win===pk)c++}});return{p,c,t}}).sort((a,b)=>b.c-a.c);
- $("leaderboard").innerHTML=rows.map((x,i)=>`<div class="player"><span><span class="small">${i+1}.</span> <span class="pname">${esc(x.p)}</span></span><b>${x.c}<span class="small"> / ${x.t}</span></b></div>`).join("");
- const me=rows.find(x=>x.p===$("player").value)||{c:0,t:0};$("progressText").textContent=`${me.c} correct out of ${me.t} graded picks`;$("progress").style.width=(me.t?me.c/me.t*100:0)+"%";renderPlayerList();
+  const rows = players.map(p => {
+    let correct = 0;
+    let graded = 0;
+
+    events.forEach(e => {
+      const winner = e.competitions?.[0]?.competitors
+        ?.find(x => x.winner)?.id;
+
+      const pick = picks[p]?.[e.id];
+
+      if (locked(e) && winner && pick) {
+        graded++;
+        if (winner === pick) correct++;
+      }
+    });
+
+    return {
+      p,
+      correct,
+      graded,
+      accuracy: graded ? Math.round(correct / graded * 100) : 0
+    };
+  }).sort((a, b) =>
+    b.correct - a.correct ||
+    b.accuracy - a.accuracy ||
+    a.p.localeCompare(b.p)
+  );
+
+  $("leaderboard").innerHTML = rows.map((x, i) => `
+    <div class="player">
+      <div style="display:flex;align-items:center;gap:10px;min-width:0">
+        <span style="font-size:20px;font-weight:800;color:${
+          i === 0 ? "#ff9a5b" :
+          i === 1 ? "#c4ccd8" :
+          i === 2 ? "#cd9168" : "#929bad"
+        }">${i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : (i + 1) + "."}</span>
+        <div style="min-width:0">
+          <div class="pname">${esc(x.p)}</div>
+          <div class="small">${x.correct} correct · ${x.accuracy}% accuracy</div>
+        </div>
+      </div>
+      <b>${x.correct}<span class="small"> / ${x.graded}</span></b>
+    </div>
+  `).join("");
+
+  const me = rows.find(x => x.p === $("player").value)
+    || { correct: 0, graded: 0 };
+
+  $("progressText").textContent =
+    `${me.correct} correct out of ${me.graded} graded picks`;
+
+  $("progress").style.width =
+    (me.graded ? me.correct / me.graded * 100 : 0) + "%";
+
+  renderPlayerList();
 }
+
 function renderPlayerList(){$("playerList").innerHTML=players.map((p,i)=>`<div class="player"><span class="pname">${esc(p)}</span>${players.length>2?`<button class="remove" onclick="removePlayer(${i})">Remove</button>`:""}</div>`).join("")}
 window.removePlayer=async i=>{
   if(players.length<=2)return toast("Keep at least 2 players");
