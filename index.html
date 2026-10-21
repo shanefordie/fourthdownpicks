@@ -509,20 +509,35 @@ toast("Save failed: " + (err.message || String(err)));
 };
 
 
+
 function updateBoard(){
+  const selector = $("boardWeek");
+
+  // Add the week options once
+  if(selector.options.length <= 1){
+    for(let w = 1; w <= 18; w++){
+      selector.add(new Option("Week " + w, String(w)));
+    }
+  }
+
+  const selectedWeek = selector.value || "all";
+
   const rows = players.map(p => {
     let correct = 0;
     let graded = 0;
 
     events.forEach(e => {
+      if(selectedWeek !== "all" &&
+         weekNo(e.date) !== Number(selectedWeek)) return;
+
       const winner = e.competitions?.[0]?.competitors
         ?.find(x => x.winner)?.id;
 
       const pick = picks[p]?.[e.id];
 
-      if (locked(e) && winner && pick) {
+      if(locked(e) && winner && pick){
         graded++;
-        if (winner === pick) correct++;
+        if(winner === pick) correct++;
       }
     });
 
@@ -530,33 +545,46 @@ function updateBoard(){
       p,
       correct,
       graded,
-      accuracy: graded ? Math.round(correct / graded * 100) : 0
+      accuracy: graded
+        ? Math.round(correct / graded * 100)
+        : 0
     };
-  }).sort((a, b) =>
+  }).sort((a,b) =>
     b.correct - a.correct ||
     b.accuracy - a.accuracy ||
     a.p.localeCompare(b.p)
   );
 
-  $("leaderboard").innerHTML = rows.map((x, i) => `
+  $("leaderboard").innerHTML = rows.map((x,i) => `
     <div class="player">
-      <div style="display:flex;align-items:center;gap:10px;min-width:0">
+      <div style="display:flex;align-items:center;gap:10px">
         <span style="font-size:20px;font-weight:800;color:${
-          i === 0 ? "#ff9a5b" :
-          i === 1 ? "#c4ccd8" :
-          i === 2 ? "#cd9168" : "#929bad"
-        }">${i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : (i + 1) + "."}</span>
-        <div style="min-width:0">
+          i===0 ? "#ff9a5b" :
+          i===1 ? "#c4ccd8" :
+          i===2 ? "#cd9168" : "#929bad"
+        }">${i===0?"🥇":i===1?"🥈":i===2?"🥉":(i+1)+"."}</span>
+        <div>
           <div class="pname">${esc(x.p)}</div>
-          <div class="small">${x.correct} correct · ${x.accuracy}% accuracy</div>
+          <div class="small">${x.accuracy}% accuracy</div>
         </div>
       </div>
       <b>${x.correct}<span class="small"> / ${x.graded}</span></b>
     </div>
   `).join("");
 
+  const winner = rows[0];
+  const hasPicks = rows.some(x => x.graded > 0);
+
+  $("weeklyWinner").textContent =
+    selectedWeek === "all"
+      ? "🏆 Overall Season Standings"
+      : hasPicks
+        ? "🏆 Week " + selectedWeek + " Leader: " +
+          winner.p + " (" + winner.correct + " correct)"
+        : "Week " + selectedWeek + " · No graded picks yet";
+
   const me = rows.find(x => x.p === $("player").value)
-    || { correct: 0, graded: 0 };
+    || {correct:0,graded:0};
 
   $("progressText").textContent =
     `${me.correct} correct out of ${me.graded} graded picks`;
@@ -566,6 +594,9 @@ function updateBoard(){
 
   renderPlayerList();
 }
+
+$("boardWeek").onchange = updateBoard;
+
 
 function renderPlayerList(){$("playerList").innerHTML=players.map((p,i)=>`<div class="player"><span class="pname">${esc(p)}</span>${players.length>2?`<button class="remove" onclick="removePlayer(${i})">Remove</button>`:""}</div>`).join("")}
 window.removePlayer=async i=>{
