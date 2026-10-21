@@ -595,7 +595,8 @@ function updateBoard(){
   renderPlayerList();
 }
 
-$("boardWeek").onchange = updateBoard;
+const boardWeek = $("boardWeek");
+if(boardWeek) boardWeek.onchange = updateBoard;
 
 function renderPlayerList(){$("playerList").innerHTML=players.map((p,i)=>`<div class="player"><span class="pname">${esc(p)}</span>${players.length>2?`<button class="remove" onclick="removePlayer(${i})">Remove</button>`:""}</div>`).join("")}
 window.removePlayer=async i=>{
