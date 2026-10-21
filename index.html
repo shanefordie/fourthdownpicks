@@ -285,10 +285,21 @@ button.remove:hover {
 <div class="top"><select id="player" class="control"></select><select id="week" class="control"></select><button id="save" class="control save">Save Picks</button><button id="refresh" class="control">Refresh</button></div>
 <div class="grid"><main class="card"><div class="head"><h2 id="weekTitle">Loading…</h2><span class="pill" id="picked">0 / 0 picked</span></div><div id="games"></div></main>
 <aside class="card side"><div class="section"><div class="sideTitle">Leaderboard</div><div id="leaderboard"></div></div>
-<div class="section"><div class="sideTitle">Players (2–6)</div><div class="notice">Add up to 6 players. Names are adjustable. Removing a player removes their saved picks on this device.</div><div id="playerList"></div><div class="row"><input id="newName" placeholder="Add player"><button id="add">Add</button></div></div>
-<div><div class="sideTitle">Your progress</div><div id="progressText" class="small">No graded picks yet</div><div class="progress"><div id="progress"></div></div></div></aside></div></div>
-<div id="toast" class="toast"></div>
+
+<div class="section">
+  <div class="sideTitle">🏆 Leaderboard</div>
+
+  <select id="boardWeek" class="control">
+    <option value="all">Overall Season</option>
+  </select>
+
+  <div id="weeklyWinner" class="notice">
+    Season standings
+  </div>
+
+  <div id="leaderboard"></div>
 </div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const sb = window.supabase.createClient(
