@@ -231,24 +231,31 @@ $("add").onclick=async()=>{
   if(!n||players.includes(n))
     return toast("Enter a unique name");
 
-  const {error}=await sb
-    .from("players")
-    .insert({display_name:n});
+  toast("Adding player...");
 
-  if(error){
-    console.error(error);
-    return toast("Couldn't add player");
+  try{
+    const {data,error}=await sb
+      .from("players")
+      .insert({display_name:n})
+      .select("id,display_name")
+      .single();
+
+    if(error) throw error;
+
+    players.push(data.display_name);
+    $("newName").value="";
+    await persist();
+
+    populatePlayers();
+    $("player").value=data.display_name;
+    localStorage.setItem("fdCurrent",data.display_name);
+    render();
+
+    toast(data.display_name+" added");
+  }catch(err){
+    console.error("Player add failed:",err);
+    toast("Add failed: "+(err.message||String(err)));
   }
-
-  players.push(n);
-  $("newName").value="";
-  await persist();
-
-  populatePlayers();
-  $("player").value=n;
-  localStorage.setItem("fdCurrent",n);
-  render();
-  toast(n+" added");
 };
 $("player").onchange=()=>{localStorage.setItem("fdCurrent",$("player").value);render()};$("week").onchange=render;$("refresh").onclick=load;$("save").onclick=()=>{persist();toast("Picks saved")};
 loadPlayers()
