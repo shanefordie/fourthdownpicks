@@ -40,11 +40,30 @@ const sb = window.supabase.createClient(
   "https://ymidmczneaufapqfaxgq.supabase.co",
   "sb_publishable_jS3BWAuUZAOEcE30GVy7eg_b4cWL8Iu"
 );
-const DEFAULT_PLAYERS=["Shane","Friend 2","Friend 3","Friend 4"];
-let players=DEFAULT_PLAYERS;
+const DEFAULT_PLAYERS=["Shane"];
+let players=[];
 let picks=JSON.parse(localStorage.getItem("fdPicks")||"{}"),events=[];
+
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+
+async function loadPlayers(){
+  const {data,error}=await sb
+    .from("players")
+    .select("id,display_name")
+    .order("created_at",{ascending:true});
+
+  if(error) throw error;
+
+  players=data.map(p=>p.display_name);
+
+  if(!players.length){
+    players=[...DEFAULT_PLAYERS];
+  }
+
+  localStorage.setItem("fdPlayers",JSON.stringify(players));
+}
+
 async function persist(){
   localStorage.setItem("fdPlayers",JSON.stringify(players));
   localStorage.setItem("fdPicks",JSON.stringify(picks));
@@ -174,7 +193,14 @@ function renderPlayerList(){$("playerList").innerHTML=players.map((p,i)=>`<div c
 window.removePlayer=i=>{if(players.length<=2)return;const p=players[i];if(!confirm("Remove "+p+"?"))return;players.splice(i,1);delete picks[p];persist();populatePlayers();render();toast("Player removed")};
 $("add").onclick=()=>{if(players.length>=6)return toast("Maximum 6 players");const n=$("newName").value.trim();if(!n||players.includes(n))return toast("Enter a unique name");players.push(n);$("newName").value="";persist();populatePlayers();$("player").value=n;localStorage.setItem("fdCurrent",n);render();toast(n+" added")};
 $("player").onchange=()=>{localStorage.setItem("fdCurrent",$("player").value);render()};$("week").onchange=render;$("refresh").onclick=load;$("save").onclick=()=>{persist();toast("Picks saved")};
-populatePlayers();load();
+loadPlayers()
+  .then(()=>load())
+  .catch(e=>{
+    console.error("Player loading failed:",e);
+    players=[...DEFAULT_PLAYERS];
+    populatePlayers();
+    load();
+  });
 $("signUp").onclick = async () => {
   const email = $("email").value.trim();
   const password = $("password").value;
