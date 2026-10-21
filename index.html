@@ -597,7 +597,6 @@ function updateBoard(){
 
 $("boardWeek").onchange = updateBoard;
 
-
 function renderPlayerList(){$("playerList").innerHTML=players.map((p,i)=>`<div class="player"><span class="pname">${esc(p)}</span>${players.length>2?`<button class="remove" onclick="removePlayer(${i})">Remove</button>`:""}</div>`).join("")}
 window.removePlayer=async i=>{
   if(players.length<=2)return toast("Keep at least 2 players");
