@@ -13,6 +13,261 @@ header,.wrap{max-width:1100px;margin:auto;padding-left:18px;padding-right:18px}h
 .card{background:#111827f5;border:1px solid var(--line);border-radius:17px;overflow:hidden}.head{padding:17px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between}.head h2{margin:0;font-size:17px}.pill{font-size:11px;padding:6px 9px;border-radius:999px;background:#182235;color:var(--muted);font-weight:900}
 .game{padding:14px 16px;border-bottom:1px solid var(--line)}.time{font-size:11px;color:var(--muted);margin-bottom:10px}.teams{display:grid;grid-template-columns:1fr 30px 1fr;gap:8px;align-items:center}.team{border:1px solid var(--line);background:#0d1524;color:var(--text);border-radius:13px;padding:12px 11px;cursor:pointer;min-height:68px}.team:disabled{cursor:not-allowed;opacity:.62}.selected{border-color:var(--accent)!important;background:#10352d!important}.home{text-align:right}.abbr{font-size:11px;color:var(--muted);font-weight:900}.name{font-weight:900;font-size:14px}.at{text-align:center;color:var(--muted)}.lock{font-size:10px;color:var(--muted);margin-top:8px}
 .side{padding:16px}.sideTitle{font-size:13px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}.section{padding-bottom:16px;margin-bottom:16px;border-bottom:1px solid var(--line)}.player{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line)}.pname{font-weight:850}.small{font-size:11px;color:var(--muted)}.notice{padding:12px;border-radius:11px;background:#0d1524;color:var(--muted);font-size:12px;line-height:1.5}.row{display:flex;gap:8px;margin-top:10px}.row input{flex:1;background:#0d1524;border:1px solid var(--line);color:white;padding:10px;border-radius:9px}.row button,.remove{border:0;border-radius:9px;padding:8px 10px;font-weight:900}.row button{background:var(--blue)}.remove{background:transparent;border:1px solid var(--line);color:var(--muted)}.progress{height:7px;background:#243047;border-radius:99px;overflow:hidden;margin-top:10px}.progress div{height:100%;background:var(--accent);width:0}.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:white;color:#07101c;padding:10px 15px;border-radius:10px;font-weight:900;display:none}
+
+/* ===== MODERN NFL PICKS REDESIGN ===== */
+
+:root {
+  color-scheme: dark;
+  --bg: #0b0d12;
+  --surface: #141821;
+  --surface-light: #1c2230;
+  --border: #2a3140;
+  --text: #f4f6fa;
+  --muted: #929bad;
+  --orange: #ff782e;
+  --orange-light: #ff9a5b;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 {
+  color: var(--text);
+  letter-spacing: -0.5px;
+}
+
+button, input, select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+  transition: background 0.18s ease,
+    border-color 0.18s ease,
+    transform 0.18s ease;
+}
+
+button:focus-visible,
+select:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 3px;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+input, select {
+  background: var(--surface-light);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 11px 13px;
+  min-height: 44px;
+}
+
+input:focus, select:focus {
+  border-color: var(--orange);
+}
+
+#games {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit, minmax(min(100%, 290px), 1fr)
+  );
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.game {
+  background: linear-gradient(
+    145deg, #191e29, #12161e
+  );
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 17px;
+  min-width: 0;
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.12);
+  transition: border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.game:hover {
+  border-color: #424b5d;
+  transform: translateY(-2px);
+}
+
+.time {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+
+.teams {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 20px minmax(0, 1fr);
+  align-items: stretch;
+  gap: 8px;
+}
+
+.team {
+  background: #202634;
+  color: var(--text);
+  border: 1px solid #30394a;
+  border-radius: 12px;
+  padding: 14px 6px;
+  min-width: 0;
+  min-height: 95px;
+}
+
+.team:hover:not(:disabled) {
+  background: #292f3d;
+  border-color: var(--orange);
+}
+
+.team.selected {
+  background: rgba(255, 120, 46, 0.13);
+  border: 2px solid var(--orange);
+  padding: 13px 5px;
+  box-shadow: inset 0 0 16px rgba(255, 120, 46, 0.06);
+}
+
+.team.home {
+  /* Keep home and away teams visually consistent */
+  color: var(--text);
+}
+
+.abbr {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  margin-bottom: 5px;
+}
+
+.team.selected .abbr {
+  color: var(--orange-light);
+}
+
+.name {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.at {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  align-self: center;
+  text-align: center;
+}
+
+.lock {
+  color: var(--muted);
+  font-size: 11px;
+  margin-top: 14px;
+  padding-top: 11px;
+  border-top: 1px solid var(--border);
+}
+
+#picked {
+  color: var(--orange-light);
+  font-weight: 700;
+}
+
+#weekTitle {
+  font-size: clamp(22px, 5vw, 30px);
+  font-weight: 800;
+}
+
+#playerList .player {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+}
+
+.pname {
+  color: var(--text);
+  font-weight: 600;
+}
+
+button.remove {
+  background: #302027;
+  color: #ff9a9a;
+  border: 1px solid #59313b;
+  border-radius: 8px;
+  padding: 7px 10px;
+}
+
+button.remove:hover {
+  background: #482832;
+}
+
+#add, #save, #refresh {
+  background: var(--orange);
+  color: #17110d;
+  border: 1px solid var(--orange);
+  border-radius: 10px;
+  padding: 10px 15px;
+  font-weight: 750;
+}
+
+#add:hover, #save:hover, #refresh:hover {
+  background: var(--orange-light);
+  border-color: var(--orange-light);
+}
+
+#toast {
+  background: var(--surface-light);
+  color: var(--text);
+  border: 1px solid var(--orange);
+  border-radius: 12px;
+  padding: 12px 16px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.3);
+}
+
+@media (max-width: 480px) {
+  #games {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .game {
+    padding: 14px;
+  }
+
+  .team {
+    min-height: 88px;
+  }
+
+  .abbr {
+    font-size: 18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 </style>
 </head>
 <body>
