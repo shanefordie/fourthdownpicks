@@ -120,6 +120,60 @@ syncGamesToDatabase().catch(e => {
   $("week").value=ws.includes(current)?current:ws[0];render();
  }catch(e){$("games").innerHTML="<div style='padding:22px'>Schedule could not be loaded. Press Refresh.</div>"}
 }
+
+async function loadSharedPicks(){
+  const { data, error } = await sb
+    .from("picks")
+    .select("player_id, game_id, selected_team");
+
+  if(error){
+    console.error("Shared picks failed to load:", error);
+    toast("Couldn't load shared picks");
+    return;
+  }
+
+  const { data: playerRows, error: playerError } = await sb
+    .from("players")
+    .select("id, display_name");
+
+  if(playerError){
+    console.error("Players failed to load:", playerError);
+    return;
+  }
+
+  const { data: gameRows, error: gameError } = await sb
+    .from("games")
+    .select("id, espn_event_id");
+
+  if(gameError){
+    console.error("Games failed to load:", gameError);
+    return;
+  }
+
+  const playerNames = Object.fromEntries(
+    playerRows.map(p => [p.id, p.display_name])
+  );
+
+  const eventIds = Object.fromEntries(
+    gameRows.map(g => [g.id, g.espn_event_id])
+  );
+
+  const shared = {};
+
+  for(const pick of data){
+    const name = playerNames[pick.player_id];
+    const eventId = eventIds[pick.game_id];
+
+    if(!name || !eventId) continue;
+
+    shared[name] ??= {};
+    shared[name][eventId] = pick.selected_team;
+  }
+
+  picks = shared;
+  render();
+}
+
 function render(){
  const p=$("player").value,w=+$("week").value;
  const gs=events.filter(e=>weekNo(e.date)===w).sort((a,b)=>new Date(a.date)-new Date(b.date));
