@@ -5,289 +5,128 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Fourth Down Picks</title>
 <style>
-:root{--bg:#070b14;--panel:#111827;--line:#29354c;--text:#f8fafc;--muted:#94a3b8;--accent:#34d399;--blue:#60a5fa}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% -10%,#1d2a45,#070b14 45%);color:var(--text);font-family:system-ui,-apple-system,sans-serif}
-header,.wrap{max-width:1100px;margin:auto;padding-left:18px;padding-right:18px}header{padding-top:26px}.eyebrow{font-size:12px;font-weight:900;letter-spacing:.18em;color:var(--accent)}h1{font-size:36px;margin:7px 0}.sub{color:var(--muted)}
-.top{display:flex;gap:9px;flex-wrap:wrap;margin:18px 0}.control{background:var(--panel);border:1px solid var(--line);color:var(--text);padding:11px 13px;border-radius:11px;font-weight:800}.save{background:var(--accent);color:#032319}
-.grid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px}@media(max-width:800px){.grid{grid-template-columns:1fr}h1{font-size:30px}}
-.card{background:#111827f5;border:1px solid var(--line);border-radius:17px;overflow:hidden}.head{padding:17px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between}.head h2{margin:0;font-size:17px}.pill{font-size:11px;padding:6px 9px;border-radius:999px;background:#182235;color:var(--muted);font-weight:900}
-.game{padding:14px 16px;border-bottom:1px solid var(--line)}.time{font-size:11px;color:var(--muted);margin-bottom:10px}.teams{display:grid;grid-template-columns:1fr 30px 1fr;gap:8px;align-items:center}.team{border:1px solid var(--line);background:#0d1524;color:var(--text);border-radius:13px;padding:12px 11px;cursor:pointer;min-height:68px}.team:disabled{cursor:not-allowed;opacity:.62}.selected{border-color:var(--accent)!important;background:#10352d!important}.home{text-align:right}.abbr{font-size:11px;color:var(--muted);font-weight:900}.name{font-weight:900;font-size:14px}.at{text-align:center;color:var(--muted)}.lock{font-size:10px;color:var(--muted);margin-top:8px}
-.side{padding:16px}.sideTitle{font-size:13px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}.section{padding-bottom:16px;margin-bottom:16px;border-bottom:1px solid var(--line)}.player{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line)}.pname{font-weight:850}.small{font-size:11px;color:var(--muted)}.notice{padding:12px;border-radius:11px;background:#0d1524;color:var(--muted);font-size:12px;line-height:1.5}.row{display:flex;gap:8px;margin-top:10px}.row input{flex:1;background:#0d1524;border:1px solid var(--line);color:white;padding:10px;border-radius:9px}.row button,.remove{border:0;border-radius:9px;padding:8px 10px;font-weight:900}.row button{background:var(--blue)}.remove{background:transparent;border:1px solid var(--line);color:var(--muted)}.progress{height:7px;background:#243047;border-radius:99px;overflow:hidden;margin-top:10px}.progress div{height:100%;background:var(--accent);width:0}.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:white;color:#07101c;padding:10px 15px;border-radius:10px;font-weight:900;display:none}
-
-/* ===== MODERN NFL PICKS REDESIGN ===== */
-
-:root {
-  color-scheme: dark;
-  --bg: #0b0d12;
-  --surface: #141821;
-  --surface-light: #1c2230;
-  --border: #2a3140;
-  --text: #f4f6fa;
-  --muted: #929bad;
-  --orange: #ff782e;
-  --orange-light: #ff9a5b;
+:root{
+  color-scheme:dark;
+  --bg:#0b0d12;--surface:#141821;--surface-light:#1c2230;--border:#2a3140;
+  --text:#f4f6fa;--muted:#929bad;--orange:#ff782e;--orange-light:#ff9a5b;
+  --panel:#111827;--line:#29354c;--accent:#34d399;--blue:#60a5fa
 }
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at 50% -10%,#1d2a45,#070b14 45%);background-color:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased}
+header,.wrap{max-width:1100px;margin:auto;padding-left:18px;padding-right:18px}
+header{padding-top:26px}
+.eyebrow{font-size:12px;font-weight:900;letter-spacing:.18em;color:var(--accent)}
+h1{font-size:36px;margin:7px 0}
+.sub{color:var(--muted)}
+.top{display:flex;gap:9px;flex-wrap:wrap;margin:18px 0}
+.control{background:var(--panel);border:1px solid var(--line);color:var(--text);padding:11px 13px;border-radius:11px;font-weight:800}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px}
+@media(max-width:800px){.grid{grid-template-columns:1fr}h1{font-size:30px}}
+.card{background:#111827f5;border:1px solid var(--line);border-radius:17px;overflow:hidden}
+.head{padding:17px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.head h2{margin:0;font-size:17px}
+.pill{font-size:11px;padding:6px 9px;border-radius:999px;background:#182235;color:var(--muted);font-weight:900}
+.side{padding:16px}
+.sideTitle{font-size:13px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+.section{padding-bottom:16px;margin-bottom:16px;border-bottom:1px solid var(--line)}
+.section:last-child{border-bottom:0;margin-bottom:0;padding-bottom:0}
+.player{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)}
+.pname{font-weight:850}
+.small{font-size:11px;color:var(--muted)}
+.row{display:flex;gap:8px;margin-top:10px}
+.row input{flex:1;min-width:0}
+.row button,.remove{border:0;border-radius:9px;padding:8px 10px;font-weight:900}
+.progress{height:7px;background:#243047;border-radius:99px;overflow:hidden;margin-top:10px}
+.progress div{height:100%;background:var(--accent);width:0}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);display:none;z-index:50}
 
-* {
-  box-sizing: border-box;
+h1,h2,h3{color:var(--text);letter-spacing:-0.5px}
+button,input,select{font:inherit}
+button{cursor:pointer;transition:background .18s ease,border-color .18s ease,transform .18s ease}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--orange);outline-offset:3px}
+button:disabled,select:disabled{cursor:not-allowed;opacity:.55}
+input,select{background:var(--surface-light);color:var(--text);border:1px solid var(--border);border-radius:10px;padding:11px 13px;min-height:44px}
+input:focus,select:focus{border-color:var(--orange)}
+
+#games{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,290px),1fr));gap:14px;padding:16px}
+.game{background:linear-gradient(145deg,#191e29,#12161e);border:1px solid var(--border);border-radius:16px;padding:17px;min-width:0;box-shadow:0 5px 18px rgba(0,0,0,.12);transition:border-color .2s ease,transform .2s ease}
+.game:hover{border-color:#424b5d;transform:translateY(-2px)}
+.time{color:var(--muted);font-size:12px;font-weight:600;margin-bottom:15px}
+.teams{display:grid;grid-template-columns:minmax(0,1fr) 20px minmax(0,1fr);align-items:stretch;gap:8px}
+.team{background:#202634;color:var(--text);border:1px solid #30394a;border-radius:12px;padding:14px 6px;min-width:0;min-height:95px}
+.team:hover:not(:disabled){background:#292f3d;border-color:var(--orange)}
+.team.selected{background:rgba(255,120,46,.13);border:2px solid var(--orange);padding:13px 5px;box-shadow:inset 0 0 16px rgba(255,120,46,.06)}
+.abbr{font-size:20px;font-weight:800;letter-spacing:.5px;margin-bottom:5px}
+.team.selected .abbr{color:var(--orange-light)}
+.name{font-size:12px;font-weight:600;line-height:1.35;overflow-wrap:anywhere}
+.at{color:var(--muted);font-size:12px;font-weight:700;align-self:center;text-align:center}
+.lock{color:var(--muted);font-size:11px;margin-top:14px;padding-top:11px;border-top:1px solid var(--border)}
+#picked{color:var(--orange-light);font-weight:700}
+#weekTitle{font-size:clamp(22px,5vw,30px);font-weight:800}
+#playerList .player,#leaderboard .player{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:8px}
+.pname{color:var(--text);font-weight:600}
+button.remove{background:#302027;color:#ff9a9a;border:1px solid #59313b;border-radius:8px;padding:7px 10px}
+button.remove:hover{background:#482832}
+#add,#save,#refresh,#signIn,#signUp{background:var(--orange);color:#17110d;border:1px solid var(--orange);border-radius:10px;padding:10px 15px;font-weight:750}
+#add:hover,#save:hover,#refresh:hover,#signIn:hover,#signUp:hover{background:var(--orange-light);border-color:var(--orange-light)}
+#toast{background:var(--surface-light);color:var(--text);border:1px solid var(--orange);border-radius:12px;padding:12px 16px;box-shadow:0 8px 28px rgba(0,0,0,.3);font-weight:700}
+#authBox{max-width:400px;margin:40px auto;padding:24px;background:var(--panel);border-radius:12px}
+#authBox input{display:block;width:100%;margin:10px 0}
+@media(max-width:480px){
+  #games{grid-template-columns:minmax(0,1fr);gap:12px;padding:12px}
+  .game{padding:14px}.team{min-height:88px}.abbr{font-size:18px}
 }
-
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-}
-
-h1, h2, h3 {
-  color: var(--text);
-  letter-spacing: -0.5px;
-}
-
-button, input, select {
-  font: inherit;
-}
-
-button {
-  cursor: pointer;
-  transition: background 0.18s ease,
-    border-color 0.18s ease,
-    transform 0.18s ease;
-}
-
-button:focus-visible,
-select:focus-visible,
-input:focus-visible {
-  outline: 2px solid var(--orange);
-  outline-offset: 3px;
-}
-
-button:disabled {
-  cursor: not-allowed;
-  opacity: 0.55;
-}
-
-input, select {
-  background: var(--surface-light);
-  color: var(--text);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 11px 13px;
-  min-height: 44px;
-}
-
-input:focus, select:focus {
-  border-color: var(--orange);
-}
-
-#games {
-  display: grid;
-  grid-template-columns: repeat(
-    auto-fit, minmax(min(100%, 290px), 1fr)
-  );
-  gap: 14px;
-  margin-top: 16px;
-}
-
-.game {
-  background: linear-gradient(
-    145deg, #191e29, #12161e
-  );
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 17px;
-  min-width: 0;
-  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.12);
-  transition: border-color 0.2s ease,
-    transform 0.2s ease;
-}
-
-.game:hover {
-  border-color: #424b5d;
-  transform: translateY(-2px);
-}
-
-.time {
-  color: var(--muted);
-  font-size: 12px;
-  font-weight: 600;
-  margin-bottom: 15px;
-}
-
-.teams {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 20px minmax(0, 1fr);
-  align-items: stretch;
-  gap: 8px;
-}
-
-.team {
-  background: #202634;
-  color: var(--text);
-  border: 1px solid #30394a;
-  border-radius: 12px;
-  padding: 14px 6px;
-  min-width: 0;
-  min-height: 95px;
-}
-
-.team:hover:not(:disabled) {
-  background: #292f3d;
-  border-color: var(--orange);
-}
-
-.team.selected {
-  background: rgba(255, 120, 46, 0.13);
-  border: 2px solid var(--orange);
-  padding: 13px 5px;
-  box-shadow: inset 0 0 16px rgba(255, 120, 46, 0.06);
-}
-
-.team.home {
-  /* Keep home and away teams visually consistent */
-  color: var(--text);
-}
-
-.abbr {
-  font-size: 20px;
-  font-weight: 800;
-  letter-spacing: 0.5px;
-  margin-bottom: 5px;
-}
-
-.team.selected .abbr {
-  color: var(--orange-light);
-}
-
-.name {
-  font-size: 12px;
-  font-weight: 600;
-  line-height: 1.35;
-  overflow-wrap: anywhere;
-}
-
-.at {
-  color: var(--muted);
-  font-size: 12px;
-  font-weight: 700;
-  align-self: center;
-  text-align: center;
-}
-
-.lock {
-  color: var(--muted);
-  font-size: 11px;
-  margin-top: 14px;
-  padding-top: 11px;
-  border-top: 1px solid var(--border);
-}
-
-#picked {
-  color: var(--orange-light);
-  font-weight: 700;
-}
-
-#weekTitle {
-  font-size: clamp(22px, 5vw, 30px);
-  font-weight: 800;
-}
-
-#playerList .player {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 10px 12px;
-  margin-bottom: 8px;
-}
-
-.pname {
-  color: var(--text);
-  font-weight: 600;
-}
-
-button.remove {
-  background: #302027;
-  color: #ff9a9a;
-  border: 1px solid #59313b;
-  border-radius: 8px;
-  padding: 7px 10px;
-}
-
-button.remove:hover {
-  background: #482832;
-}
-
-#add, #save, #refresh {
-  background: var(--orange);
-  color: #17110d;
-  border: 1px solid var(--orange);
-  border-radius: 10px;
-  padding: 10px 15px;
-  font-weight: 750;
-}
-
-#add:hover, #save:hover, #refresh:hover {
-  background: var(--orange-light);
-  border-color: var(--orange-light);
-}
-
-#toast {
-  background: var(--surface-light);
-  color: var(--text);
-  border: 1px solid var(--orange);
-  border-radius: 12px;
-  padding: 12px 16px;
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.3);
-}
-
-@media (max-width: 480px) {
-  #games {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 12px;
-  }
-
-  .game {
-    padding: 14px;
-  }
-
-  .team {
-    min-height: 88px;
-  }
-
-  .abbr {
-    font-size: 18px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    transition: none !important;
-    scroll-behavior: auto !important;
-  }
-}
-
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;scroll-behavior:auto!important}}
 </style>
 </head>
 <body>
-  <div id="authBox" style="max-width:400px;margin:40px auto;padding:24px;background:#111827;border-radius:12px;color:white">
+
+<div id="authBox">
   <h2>Fourth Down Picks</h2>
-  <input id="email" type="email" placeholder="Email" style="display:block;width:100%;padding:12px;margin:10px 0">
-  <input id="password" type="password" placeholder="Password" style="display:block;width:100%;padding:12px;margin:10px 0">
+  <input id="email" type="email" placeholder="Email" autocomplete="email">
+  <input id="password" type="password" placeholder="Password" autocomplete="current-password">
   <button id="signIn">Sign In</button>
   <button id="signUp">Create Account</button>
   <p id="authMessage"></p>
 </div>
-<div id="appContent" style="display: none !important;">
-<header><div class="eyebrow">FOURTH DOWN PICKS</div><h1>Pick. Compete. Win.</h1><div class="sub">Your group's weekly NFL prediction league.</div></header>
-<div class="wrap">
-<div class="section">
-  <div class="sideTitle">Leaderboard</div>
-  <div id="leaderboard"></div>
-</div>
 
-  <div id="leaderboard"></div>
+<div id="appContent" style="display:none !important;">
+  <header>
+    <div class="eyebrow">FOURTH DOWN PICKS</div>
+    <h1>Pick. Compete. Win.</h1>
+    <div class="sub">Your group's weekly NFL prediction league.</div>
+  </header>
+  <div class="wrap">
+    <div class="top">
+      <select id="player" class="control" aria-label="Player"></select>
+      <select id="week" class="control" aria-label="Week"></select>
+      <button id="refresh" class="control">Refresh</button>
+      <button id="save" class="control">Save</button>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <div class="head"><h2 id="weekTitle"></h2><span class="pill" id="picked"></span></div>
+        <div id="games"></div>
+      </div>
+      <div class="card side">
+        <div class="section">
+          <div class="sideTitle">Leaderboard</div>
+          <div id="leaderboard"></div>
+        </div>
+        <div class="section">
+          <div class="sideTitle">Your accuracy</div>
+          <div id="progressText" class="small"></div>
+          <div class="progress"><div id="progress"></div></div>
+        </div>
+        <div class="section">
+          <div class="sideTitle">Players</div>
+          <div id="playerList"></div>
+          <div class="row"><input id="newName" placeholder="Add player"><button id="add">Add</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="toast" class="toast"></div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -296,156 +135,152 @@ const sb = window.supabase.createClient(
   "https://ymidmczneaufapqfaxgq.supabase.co",
   "sb_publishable_jS3BWAuUZAOEcE30GVy7eg_b4cWL8Iu"
 );
-const DEFAULT_PLAYERS=["Shane"];
-let players=[];
-let picks=JSON.parse(localStorage.getItem("fdPicks")||"{}"),events=[];
+const DEFAULT_PLAYERS = ["Shane"];
+let players = [];
+let myPlayer = null;
+let started = false;
+let picks = JSON.parse(localStorage.getItem("fdPicks") || "{}"), events = [];
 
-const $=id=>document.getElementById(id);
-const esc=s=>String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
 
-async function loadPlayers(){
-  const {data,error}=await sb
-    .from("players")
-    .select("id,display_name")
-    .order("created_at",{ascending:true});
-
-  if(error) throw error;
-
-  players=data.map(p=>p.display_name);
-
-  if(!players.length){
-    players=[...DEFAULT_PLAYERS];
+async function loadMyPlayer() {
+  try {
+    const { data: { user } } = await sb.auth.getUser();
+    if (!user) return;
+    const { data: acct } = await sb.from("player_accounts").select("player_id").eq("user_id", user.id).maybeSingle();
+    if (!acct) return;
+    const { data: pl } = await sb.from("players").select("display_name").eq("id", acct.player_id).maybeSingle();
+    myPlayer = pl?.display_name || null;
+  } catch (e) {
+    console.error("Couldn't load your player:", e);
   }
+}
 
-  localStorage.setItem("fdPlayers",JSON.stringify(players));
-  
+async function loadPlayers() {
+  const { data, error } = await sb.from("players").select("id,display_name").order("created_at", { ascending: true });
+  if (error) throw error;
+  players = data.map(p => p.display_name);
+  if (!players.length) players = [...DEFAULT_PLAYERS];
+  localStorage.setItem("fdPlayers", JSON.stringify(players));
   populatePlayers();
-  
 }
 
-async function persist(){
-  localStorage.setItem("fdPlayers",JSON.stringify(players));
-  localStorage.setItem("fdPicks",JSON.stringify(picks));
+async function persist() {
+  localStorage.setItem("fdPlayers", JSON.stringify(players));
+  localStorage.setItem("fdPicks", JSON.stringify(picks));
 }
-function toast(s){$("toast").textContent=s;$("toast").style.display="block";setTimeout(()=>$("toast").style.display="none",1500)}
-function weekNo(date){const start=new Date("2026-09-09T00:00:00"),d=new Date(date);return Math.max(1,Math.floor((d-start)/604800000)+1)}
-function fmt(x){return new Intl.DateTimeFormat("en-US",{weekday:"short",month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}).format(new Date(x))}
-function teams(e){const c=e.competitions[0];return{a:c.competitors.find(x=>x.homeAway==="away"),h:c.competitors.find(x=>x.homeAway==="home")}}
-function locked(e){return !!e.status?.type?.completed||new Date(e.date)<=new Date()}
-function populatePlayers(){const current=localStorage.getItem("fdCurrent")||players[0];$("player").innerHTML=players.map(p=>`<option value="${esc(p)}">${esc(p)}</option>`).join("");$("player").value=players.includes(current)?current:players[0];renderPlayerList()}
-async function syncGamesToDatabase(){
+function toast(s) {
+  $("toast").textContent = s;
+  $("toast").style.display = "block";
+  setTimeout(() => $("toast").style.display = "none", 1500);
+}
+function weekNo(date) {
+  const start = new Date("2026-09-09T00:00:00"), d = new Date(date);
+  return Math.max(1, Math.floor((d - start) / 604800000) + 1);
+}
+function fmt(x) {
+  return new Intl.DateTimeFormat("en-US", { weekday:"short", month:"short", day:"numeric", hour:"numeric", minute:"2-digit" }).format(new Date(x));
+}
+function teams(e) {
+  const c = e.competitions[0];
+  return { a: c.competitors.find(x => x.homeAway === "away"), h: c.competitors.find(x => x.homeAway === "home") };
+}
+function locked(e) { return !!e.status?.type?.completed || new Date(e.date) <= new Date(); }
+
+function populatePlayers() {
+  const current = myPlayer || localStorage.getItem("fdCurrent") || players[0];
+  $("player").innerHTML = players.map(p => `<option value="${esc(p)}">${esc(p)}</option>`).join("");
+  $("player").value = players.includes(current) ? current : players[0];
+  $("player").disabled = !!(myPlayer && players.includes(myPlayer));
+  renderPlayerList();
+}
+
+async function syncGamesToDatabase() {
   const weekIds = {};
-
-  const { data: weeks, error: weekError } = await sb
-    .from("weeks")
-    .select("id, week_number");
-
+  const { data: weeks, error: weekError } = await sb.from("weeks").select("id, week_number");
   if (weekError) throw weekError;
-
-  weeks.forEach(w => {
-    weekIds[w.week_number] = w.id;
-  });
+  weeks.forEach(w => { weekIds[w.week_number] = w.id; });
 
   for (const e of events) {
     const w = weekNo(e.date);
+    if (!weekIds[w]) continue; // no matching week row in the database
     const t = teams(e);
-    const { error } = await sb
-      .from("games")
-      .upsert({
-        espn_event_id: e.id,
-        week_id: weekIds[w],
-        home_team: t.h.team.displayName,
-        away_team: t.a.team.displayName,
-        kickoff_at: e.date
-      }, { onConflict: "espn_event_id" });
-
+    const { error } = await sb.from("games").upsert({
+      espn_event_id: e.id,
+      week_id: weekIds[w],
+      home_team: t.h.team.displayName,
+      away_team: t.a.team.displayName,
+      kickoff_at: e.date
+    }, { onConflict: "espn_event_id" });
     if (error) throw error;
   }
   await loadSharedPicks();
 }
-async function load(){
- $("games").innerHTML="<div style='padding:22px;color:#94a3b8'>Loading the 2026 NFL schedule…</div>";
- try{
-  const r=await fetch("https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?dates=2026&seasontype=2&limit=500");
-const d=await r.json();
-events=d.events||[];
 
-syncGamesToDatabase().catch(e => {
-  console.error("Game sync failed:", e);
-  toast("Database sync failed");
-});
-  const ws=[...new Set(events.map(e=>weekNo(e.date)))].sort((a,b)=>a-b);
-  $("week").innerHTML=ws.map(w=>`<option value="${w}">Week ${w}</option>`).join("");
-  const current=Math.max(1,Math.min(18,weekNo(new Date())));
-  $("week").value=ws.includes(current)?current:ws[0];render();
- }catch(e){$("games").innerHTML="<div style='padding:22px'>Schedule could not be loaded. Press Refresh.</div>"}
+async function load() {
+  $("games").innerHTML = "<div style='padding:22px;color:#94a3b8'>Loading the 2026 NFL schedule…</div>";
+  try {
+    const r = await fetch("https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?dates=2026&seasontype=2&limit=500");
+    const d = await r.json();
+    events = d.events || [];
+
+    syncGamesToDatabase().catch(e => {
+      console.error("Game sync failed:", e);
+      toast("Database sync failed");
+    });
+
+    const ws = [...new Set(events.map(e => weekNo(e.date)))].sort((a, b) => a - b);
+    $("week").innerHTML = ws.map(w => `<option value="${w}">Week ${w}</option>`).join("");
+    const current = Math.max(1, Math.min(18, weekNo(new Date())));
+    $("week").value = ws.includes(current) ? current : ws[0];
+    render();
+  } catch (e) {
+    $("games").innerHTML = "<div style='padding:22px'>Schedule could not be loaded. Press Refresh.</div>";
+  }
 }
 
-async function loadSharedPicks(){
-  const { data, error } = await sb
-    .from("picks")
-    .select("player_id, game_id, selected_team");
+async function loadSharedPicks() {
+  const { data, error } = await sb.from("picks").select("player_id, game_id, selected_team");
+  if (error) { console.error("Shared picks failed to load:", error); toast("Couldn't load shared picks"); return; }
 
-  if(error){
-    console.error("Shared picks failed to load:", error);
-    toast("Couldn't load shared picks");
-    return;
-  }
+  const { data: playerRows, error: playerError } = await sb.from("players").select("id, display_name");
+  if (playerError) { console.error("Players failed to load:", playerError); return; }
 
-  const { data: playerRows, error: playerError } = await sb
-    .from("players")
-    .select("id, display_name");
+  const { data: gameRows, error: gameError } = await sb.from("games").select("id, espn_event_id");
+  if (gameError) { console.error("Games failed to load:", gameError); return; }
 
-  if(playerError){
-    console.error("Players failed to load:", playerError);
-    return;
-  }
-
-  const { data: gameRows, error: gameError } = await sb
-    .from("games")
-    .select("id, espn_event_id");
-
-  if(gameError){
-    console.error("Games failed to load:", gameError);
-    return;
-  }
-
-  const playerNames = Object.fromEntries(
-    playerRows.map(p => [p.id, p.display_name])
-  );
-
-  const eventIds = Object.fromEntries(
-    gameRows.map(g => [g.id, g.espn_event_id])
-  );
+  const playerNames = Object.fromEntries(playerRows.map(p => [p.id, p.display_name]));
+  const eventIds = Object.fromEntries(gameRows.map(g => [g.id, g.espn_event_id]));
 
   const shared = {};
-
-  for(const pick of data){
+  for (const pick of data) {
     const name = playerNames[pick.player_id];
     const eventId = eventIds[pick.game_id];
-
-    if(!name || !eventId) continue;
-
+    if (!name || !eventId) continue;
     shared[name] ??= {};
     shared[name][eventId] = pick.selected_team;
   }
-
   picks = shared;
   render();
 }
 
-function render(){
- const p=$("player").value,w=+$("week").value;
- const gs=events.filter(e=>weekNo(e.date)===w).sort((a,b)=>new Date(a.date)-new Date(b.date));
- let count=0;$("weekTitle").textContent=`Week ${w}`;
- $("games").innerHTML=gs.map(e=>{
-  const t=teams(e),pk=picks[p]?.[e.id],isLocked=locked(e);if(pk)count++;
-  return `<div class="game"><div class="time">${fmt(e.date)} · ${e.status?.type?.shortDetail||""}</div><div class="teams">
-  <button class="team ${pk===t.a.id?"selected":""}" ${isLocked?"disabled":""} onclick="choose('${e.id}','${t.a.id}')"><div class="abbr">${esc(t.a.abbreviation||"")}</div><div class="name">${esc(t.a.team.displayName)}</div></button>
-  <div class="at">@</div><button class="team home ${pk===t.h.id?"selected":""}" ${isLocked?"disabled":""} onclick="choose('${e.id}','${t.h.id}')"><div class="abbr">${esc(t.h.abbreviation||"")}</div><div class="name">${esc(t.h.team.displayName)}</div></button>
-  </div><div class="lock">${isLocked?"🔒 Game started/final · picks locked":pk?"✓ Pick saved":"Tap a team to pick the winner"}</div></div>`
- }).join("")||"<div style='padding:22px;color:#94a3b8'>No games this week.</div>";
- $("picked").textContent=`${count} / ${gs.length} picked`;updateBoard();
+function render() {
+  const p = $("player").value, w = +$("week").value;
+  const gs = events.filter(e => weekNo(e.date) === w).sort((a, b) => new Date(a.date) - new Date(b.date));
+  let count = 0;
+  $("weekTitle").textContent = `Week ${w}`;
+  $("games").innerHTML = gs.map(e => {
+    const t = teams(e), pk = picks[p]?.[e.id], isLocked = locked(e);
+    if (pk) count++;
+    return `<div class="game"><div class="time">${fmt(e.date)} · ${e.status?.type?.shortDetail || ""}</div><div class="teams">
+      <button class="team ${pk === t.a.id ? "selected" : ""}" ${isLocked ? "disabled" : ""} onclick="choose('${e.id}','${t.a.id}')"><div class="abbr">${esc(t.a.abbreviation || "")}</div><div class="name">${esc(t.a.team.displayName)}</div></button>
+      <div class="at">@</div>
+      <button class="team home ${pk === t.h.id ? "selected" : ""}" ${isLocked ? "disabled" : ""} onclick="choose('${e.id}','${t.h.id}')"><div class="abbr">${esc(t.h.abbreviation || "")}</div><div class="name">${esc(t.h.team.displayName)}</div></button>
+      </div><div class="lock">${isLocked ? "🔒 Game started/final · picks locked" : pk ? "✓ Pick saved" : "Tap a team to pick the winner"}</div></div>`;
+  }).join("") || "<div style='padding:22px;color:#94a3b8'>No games this week.</div>";
+  $("picked").textContent = `${count} / ${gs.length} picked`;
+  updateBoard();
 }
 
 window.choose = async (id, team) => {
@@ -453,9 +288,10 @@ window.choose = async (id, team) => {
   if (!e || locked(e)) return;
 
   const p = $("player").value;
+  if (myPlayer && p !== myPlayer) return toast("You can only pick for yourself");
+
   picks[p] ??= {};
   picks[p][id] = team;
-
   render();
   toast("Saving pick...");
 
@@ -464,237 +300,175 @@ window.choose = async (id, team) => {
     if (userError) throw userError;
     if (!user) throw new Error("Please sign in again.");
 
-    const { data: account, error: accountError } = await sb
-      .from("player_accounts")
-      .select("player_id")
-      .eq("user_id", user.id)
-      .single();
-
+    const { data: account, error: accountError } = await sb.from("player_accounts").select("player_id").eq("user_id", user.id).single();
     if (accountError) throw accountError;
 
-    const { data: game, error: gameError } = await sb
-      .from("games")
-      .select("id")
-      .eq("espn_event_id", id)
-      .single();
-
+    const { data: game, error: gameError } = await sb.from("games").select("id").eq("espn_event_id", id).single();
     if (gameError) throw gameError;
 
-    const { error: pickError } = await sb
-      .from("picks")
-      .upsert({
-        player_id: account.player_id,
-        game_id: game.id,
-        selected_team: team
-      }, { onConflict: "player_id,game_id" });
-
+    const { error: pickError } = await sb.from("picks").upsert({
+      player_id: account.player_id,
+      game_id: game.id,
+      selected_team: team
+    }, { onConflict: "player_id,game_id" });
     if (pickError) throw pickError;
 
     await persist();
     toast("Pick saved!");
   } catch (err) {
     console.error("Pick save failed:", err);
-toast("Save failed: " + (err.message || String(err)));
+    toast("Save failed: " + (err.message || String(err)));
   }
 };
 
-function updateBoard(){
-  const rows=players.map(p=>{
-    let correct=0;
-    let graded=0;
-
-    events.forEach(e=>{
-      const winner=e.competitions?.[0]?.competitors?.find(x=>x.winner)?.id;
-      const pick=picks[p]?.[e.id];
-
-      if(locked(e)&&winner&&pick){
+function updateBoard() {
+  const rows = players.map(p => {
+    let correct = 0, graded = 0;
+    events.forEach(e => {
+      const winner = e.competitions?.[0]?.competitors?.find(x => x.winner)?.id;
+      const pick = picks[p]?.[e.id];
+      if (locked(e) && winner && pick) {
         graded++;
-        if(winner===pick)correct++;
+        if (winner === pick) correct++;
       }
     });
+    return { p, correct, graded, accuracy: graded ? Math.round(correct / graded * 100) : 0 };
+  }).sort((a, b) => b.correct - a.correct || b.accuracy - a.accuracy || a.p.localeCompare(b.p));
 
-    return {
-      p,
-      correct,
-      graded,
-      accuracy:graded?Math.round(correct/graded*100):0
-    };
-  }).sort((a,b)=>
-    b.correct-a.correct ||
-    b.accuracy-a.accuracy ||
-    a.p.localeCompare(b.p)
-  );
-
-  $("leaderboard").innerHTML=rows.map((x,i)=>`
+  $("leaderboard").innerHTML = rows.map((x, i) => `
     <div class="player">
       <div style="display:flex;align-items:center;gap:10px">
-        <span style="font-size:20px;font-weight:800;color:${
-          i===0?"#ff9a5b":
-          i===1?"#c4ccd8":
-          i===2?"#cd9168":"#929bad"
-        }">${i===0?"🥇":i===1?"🥈":i===2?"🥉":(i+1)+"."}</span>
+        <span style="font-size:20px;font-weight:800;color:${i===0?"#ff9a5b":i===1?"#c4ccd8":i===2?"#cd9168":"#929bad"}">${i===0?"🥇":i===1?"🥈":i===2?"🥉":(i+1)+"."}</span>
         <div>
           <div class="pname">${esc(x.p)}</div>
           <div class="small">${x.accuracy}% accuracy</div>
         </div>
       </div>
       <b>${x.correct}<span class="small"> / ${x.graded}</span></b>
-    </div>
-  `).join("");
+    </div>`).join("");
 
-  const me=rows.find(x=>x.p===$("player").value)
-    ||{correct:0,graded:0};
-
-  $("progressText").textContent=
-    `${me.correct} correct out of ${me.graded} graded picks`;
-
-  $("progress").style.width=
-    (me.graded?me.correct/me.graded*100:0)+"%";
-
+  const me = rows.find(x => x.p === $("player").value) || { correct: 0, graded: 0 };
+  $("progressText").textContent = `${me.correct} correct out of ${me.graded} graded picks`;
+  $("progress").style.width = (me.graded ? me.correct / me.graded * 100 : 0) + "%";
   renderPlayerList();
 }
 
-function renderPlayerList(){$("playerList").innerHTML=players.map((p,i)=>`<div class="player"><span class="pname">${esc(p)}</span>${players.length>2?`<button class="remove" onclick="removePlayer(${i})">Remove</button>`:""}</div>`).join("")}
-window.removePlayer=async i=>{
-  if(players.length<=2)return toast("Keep at least 2 players");
+function renderPlayerList() {
+  $("playerList").innerHTML = players.map((p, i) =>
+    `<div class="player"><span class="pname">${esc(p)}</span>${players.length > 2 ? `<button class="remove" onclick="removePlayer(${i})">Remove</button>` : ""}</div>`
+  ).join("");
+}
 
-  const p=players[i];
-  if(!confirm("Remove "+p+"?"))return;
+window.removePlayer = async i => {
+  if (players.length <= 2) return toast("Keep at least 2 players");
+  const p = players[i];
+  if (!confirm("Remove " + p + "?")) return;
 
-  const {data,error}=await sb
-    .from("players")
-    .select("id")
-    .eq("display_name",p)
-    .single();
+  const { data, error } = await sb.from("players").select("id").eq("display_name", p).single();
+  if (error) return toast("Couldn't find player");
 
-  if(error)return toast("Couldn't find player");
-
-  const {error:deleteError}=await sb
-    .from("players")
-    .delete()
-    .eq("id",data.id);
-
-  if(deleteError){
+  const { error: deleteError } = await sb.from("players").delete().eq("id", data.id);
+  if (deleteError) {
     console.error(deleteError);
     return toast("Couldn't remove player");
   }
 
-  players.splice(i,1);
+  players.splice(i, 1);
   delete picks[p];
   await persist();
-
   populatePlayers();
   render();
-  toast(p+" removed");
+  toast(p + " removed");
 };
 
-$("add").onclick=async()=>{
-  if(players.length>=6)return toast("Maximum 6 players");
-
-  const n=$("newName").value.trim();
-
-  if(!n||players.includes(n))
-    return toast("Enter a unique name");
+$("add").onclick = async () => {
+  if (players.length >= 6) return toast("Maximum 6 players");
+  const n = $("newName").value.trim();
+  if (!n || players.includes(n)) return toast("Enter a unique name");
 
   toast("Adding player...");
-
-  try{
-    const {data,error}=await sb
-      .from("players")
-      .insert({display_name:n})
-      .select("id,display_name")
-      .single();
-
-    if(error) throw error;
+  try {
+    const { data, error } = await sb.from("players").insert({ display_name: n }).select("id,display_name").single();
+    if (error) throw error;
 
     players.push(data.display_name);
-    $("newName").value="";
+    $("newName").value = "";
     await persist();
-
     populatePlayers();
-    $("player").value=data.display_name;
-    localStorage.setItem("fdCurrent",data.display_name);
+    if (!myPlayer) {
+      $("player").value = data.display_name;
+      localStorage.setItem("fdCurrent", data.display_name);
+    }
     render();
-
-    toast(data.display_name+" added");
-  }catch(err){
-    console.error("Player add failed:",err);
-    toast("Add failed: "+(err.message||String(err)));
+    toast(data.display_name + " added");
+  } catch (err) {
+    console.error("Player add failed:", err);
+    toast("Add failed: " + (err.message || String(err)));
   }
 };
-$("player").onchange=()=>{localStorage.setItem("fdCurrent",$("player").value);render()};$("week").onchange=render;$("refresh").onclick=load;$("save").onclick=()=>{persist();toast("Picks saved")};
-loadPlayers()
-  .then(()=>load())
-  .catch(e=>{
-    console.error("Player loading failed:",e);
-    players=[...DEFAULT_PLAYERS];
+
+$("player").onchange = () => { localStorage.setItem("fdCurrent", $("player").value); render(); };
+$("week").onchange = render;
+$("refresh").onclick = load;
+$("save").onclick = () => { persist(); toast("Picks saved"); };
+
+async function startApp() {
+  await loadMyPlayer();
+  try {
+    await loadPlayers();
+  } catch (e) {
+    console.error("Player loading failed:", e);
+    players = [...DEFAULT_PLAYERS];
     populatePlayers();
-    load();
-  });
+  }
+  load();
+}
+
 $("signUp").onclick = async () => {
   const email = $("email").value.trim();
   const password = $("password").value;
-
-  if (!email || !password) {
-    $("authMessage").textContent = "Enter an email and password.";
-    return;
-  }
-
+  if (!email || !password) { $("authMessage").textContent = "Enter an email and password."; return; }
   try {
-    const { data, error } = await sb.auth.signUp({
-      email,
-      password
-    });
-
+    const { data, error } = await sb.auth.signUp({ email, password });
     console.log("Sign-up response:", data, error);
-
     $("authMessage").textContent = error
       ? "Sign-up error: " + error.message
       : "Account created! Check your email if confirmation is required.";
   } catch (err) {
     console.error("Sign-up failed:", err);
-    $("authMessage").textContent =
-      "Sign-up error: " + (err.message || String(err));
+    $("authMessage").textContent = "Sign-up error: " + (err.message || String(err));
   }
 };
 
 $("signIn").onclick = async () => {
   const email = $("email").value.trim();
   const password = $("password").value;
-
-  if (!email || !password) {
-    $("authMessage").textContent = "Enter an email and password.";
-    return;
-  }
-
+  if (!email || !password) { $("authMessage").textContent = "Enter an email and password."; return; }
   try {
-    const { data, error } = await sb.auth.signInWithPassword({
-      email,
-      password
-    });
-
-    console.log("Sign-in response:", data, error);
-
-    $("authMessage").textContent = error
-      ? "Sign-in error: " + error.message
-      : "Signed in! Refresh the page to continue.";
+    const { error } = await sb.auth.signInWithPassword({ email, password });
+    if (error) {
+      $("authMessage").textContent = "Sign-in error: " + error.message;
+    } else {
+      $("authMessage").textContent = "";
+      await updateAuthUI();
+    }
   } catch (err) {
     console.error("Sign-in failed:", err);
-    $("authMessage").textContent =
-      "Sign-in error: " + (err.message || String(err));
+    $("authMessage").textContent = "Sign-in error: " + (err.message || String(err));
   }
 };
+
 async function updateAuthUI() {
   const { data: { session } } = await sb.auth.getSession();
-
   $("authBox").style.display = session ? "none" : "block";
-$("appContent").style.setProperty("display", session ? "block" : "none", "important");
+  $("appContent").style.setProperty("display", session ? "block" : "none", "important");
+  if (session && !started) {
+    started = true;
+    startApp();
+  }
 }
 
-sb.auth.onAuthStateChange(() => {
-  updateAuthUI();
-});
-
+sb.auth.onAuthStateChange(() => { updateAuthUI(); });
 updateAuthUI();
 </script>
 </body>
