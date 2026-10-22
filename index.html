@@ -634,19 +634,55 @@ loadPlayers()
 $("signUp").onclick = async () => {
   const email = $("email").value.trim();
   const password = $("password").value;
-  const { error } = await sb.auth.signUp({ email, password });
-  $("authMessage").textContent = error
-    ? error.message
-    : "Account created! Check your email if confirmation is required.";
+
+  if (!email || !password) {
+    $("authMessage").textContent = "Enter an email and password.";
+    return;
+  }
+
+  try {
+    const { data, error } = await sb.auth.signUp({
+      email,
+      password
+    });
+
+    console.log("Sign-up response:", data, error);
+
+    $("authMessage").textContent = error
+      ? "Sign-up error: " + error.message
+      : "Account created! Check your email if confirmation is required.";
+  } catch (err) {
+    console.error("Sign-up failed:", err);
+    $("authMessage").textContent =
+      "Sign-up error: " + (err.message || String(err));
+  }
 };
 
 $("signIn").onclick = async () => {
   const email = $("email").value.trim();
   const password = $("password").value;
-  const { error } = await sb.auth.signInWithPassword({ email, password });
-  $("authMessage").textContent = error
-    ? error.message
-    : "Signed in! Refresh the page to continue.";
+
+  if (!email || !password) {
+    $("authMessage").textContent = "Enter an email and password.";
+    return;
+  }
+
+  try {
+    const { data, error } = await sb.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    console.log("Sign-in response:", data, error);
+
+    $("authMessage").textContent = error
+      ? "Sign-in error: " + error.message
+      : "Signed in! Refresh the page to continue.";
+  } catch (err) {
+    console.error("Sign-in failed:", err);
+    $("authMessage").textContent =
+      "Sign-in error: " + (err.message || String(err));
+  }
 };
 async function updateAuthUI() {
   const { data: { session } } = await sb.auth.getSession();
