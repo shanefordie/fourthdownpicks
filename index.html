@@ -102,6 +102,7 @@ button.remove:hover{background:#482832}
       <select id="week" class="control" aria-label="Week"></select>
       <button id="refresh" class="control">Refresh</button>
       <button id="save" class="control">Save</button>
+      <button id="signOut" class="control">Sign out</button>
     </div>
     <div class="grid">
       <div class="card">
@@ -117,11 +118,6 @@ button.remove:hover{background:#482832}
           <div class="sideTitle">Your accuracy</div>
           <div id="progressText" class="small"></div>
           <div class="progress"><div id="progress"></div></div>
-        </div>
-        <div class="section">
-          <div class="sideTitle">Players</div>
-          <div id="playerList"></div>
-          <div class="row"><input id="newName" placeholder="Add player"><button id="add">Add</button></div>
         </div>
       </div>
     </div>
@@ -145,16 +141,26 @@ const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
 
 async function loadMyPlayer() {
-  try {
-    const { data: { user } } = await sb.auth.getUser();
-    if (!user) return;
-    const { data: acct } = await sb.from("player_accounts").select("player_id").eq("user_id", user.id).maybeSingle();
-    if (!acct) return;
-    const { data: pl } = await sb.from("players").select("display_name").eq("id", acct.player_id).maybeSingle();
-    myPlayer = pl?.display_name || null;
-  } catch (e) {
-    console.error("Couldn't load your player:", e);
+  const { data: { user } } = await sb.auth.getUser();
+  if (!user) return;
+  const { data: acct, error } = await sb.from("player_accounts").select("player_id").eq("user_id", user.id).maybeSingle();
+  if (error) throw error;
+
+  if (acct?.player_id) {
+    const { data: pl, error: nErr } = await sb.from("players").select("display_name").eq("id", acct.player_id).single();
+    if (nErr) throw nErr;
+    myPlayer = pl.display_name;
+    return;
   }
+
+  // First sign-in: create this user's player and link it to their account
+  const suggested = (user.email || "Player").split("@")[0];
+  const name = (prompt("Pick a display name for the leaderboard:", suggested) || suggested).trim().slice(0, 30);
+  const { data: pl, error: pErr } = await sb.from("players").insert({ display_name: name }).select("id,display_name").single();
+  if (pErr) throw pErr;
+  const { error: aErr } = await sb.from("player_accounts").insert({ user_id: user.id, player_id: pl.id });
+  if (aErr) throw aErr;
+  myPlayer = pl.display_name;
 }
 
 async function loadPlayers() {
@@ -192,8 +198,6 @@ function populatePlayers() {
   const current = myPlayer || localStorage.getItem("fdCurrent") || players[0];
   $("player").innerHTML = players.map(p => `<option value="${esc(p)}">${esc(p)}</option>`).join("");
   $("player").value = players.includes(current) ? current : players[0];
-  $("player").disabled = !!(myPlayer && players.includes(myPlayer));
-  renderPlayerList();
 }
 
 async function syncGamesToDatabase() {
@@ -271,13 +275,13 @@ function render() {
   let count = 0;
   $("weekTitle").textContent = `Week ${w}`;
   $("games").innerHTML = gs.map(e => {
-    const t = teams(e), pk = picks[p]?.[e.id], isLocked = locked(e);
+    const t = teams(e), pk = picks[p]?.[e.id], over = locked(e), notMine = !!myPlayer && p !== myPlayer, isLocked = over || notMine;
     if (pk) count++;
     return `<div class="game"><div class="time">${fmt(e.date)} · ${e.status?.type?.shortDetail || ""}</div><div class="teams">
       <button class="team ${pk === t.a.id ? "selected" : ""}" ${isLocked ? "disabled" : ""} onclick="choose('${e.id}','${t.a.id}')"><div class="abbr">${esc(t.a.abbreviation || "")}</div><div class="name">${esc(t.a.team.displayName)}</div></button>
       <div class="at">@</div>
       <button class="team home ${pk === t.h.id ? "selected" : ""}" ${isLocked ? "disabled" : ""} onclick="choose('${e.id}','${t.h.id}')"><div class="abbr">${esc(t.h.abbreviation || "")}</div><div class="name">${esc(t.h.team.displayName)}</div></button>
-      </div><div class="lock">${isLocked ? "🔒 Game started/final · picks locked" : pk ? "✓ Pick saved" : "Tap a team to pick the winner"}</div></div>`;
+      </div><div class="lock">${over ? "🔒 Game started/final · picks locked" : notMine ? "Viewing " + esc(p) + "'s picks" : pk ? "✓ Pick saved" : "Tap a team to pick the winner"}</div></div>`;
   }).join("") || "<div style='padding:22px;color:#94a3b8'>No games this week.</div>";
   $("picked").textContent = `${count} / ${gs.length} picked`;
   updateBoard();
@@ -350,70 +354,16 @@ function updateBoard() {
   const me = rows.find(x => x.p === $("player").value) || { correct: 0, graded: 0 };
   $("progressText").textContent = `${me.correct} correct out of ${me.graded} graded picks`;
   $("progress").style.width = (me.graded ? me.correct / me.graded * 100 : 0) + "%";
-  renderPlayerList();
 }
-
-function renderPlayerList() {
-  $("playerList").innerHTML = players.map((p, i) =>
-    `<div class="player"><span class="pname">${esc(p)}</span>${players.length > 2 ? `<button class="remove" onclick="removePlayer(${i})">Remove</button>` : ""}</div>`
-  ).join("");
-}
-
-window.removePlayer = async i => {
-  if (players.length <= 2) return toast("Keep at least 2 players");
-  const p = players[i];
-  if (!confirm("Remove " + p + "?")) return;
-
-  const { data, error } = await sb.from("players").select("id").eq("display_name", p).single();
-  if (error) return toast("Couldn't find player");
-
-  const { error: deleteError } = await sb.from("players").delete().eq("id", data.id);
-  if (deleteError) {
-    console.error(deleteError);
-    return toast("Couldn't remove player");
-  }
-
-  players.splice(i, 1);
-  delete picks[p];
-  await persist();
-  populatePlayers();
-  render();
-  toast(p + " removed");
-};
-
-$("add").onclick = async () => {
-  if (players.length >= 6) return toast("Maximum 6 players");
-  const n = $("newName").value.trim();
-  if (!n || players.includes(n)) return toast("Enter a unique name");
-
-  toast("Adding player...");
-  try {
-    const { data, error } = await sb.from("players").insert({ display_name: n }).select("id,display_name").single();
-    if (error) throw error;
-
-    players.push(data.display_name);
-    $("newName").value = "";
-    await persist();
-    populatePlayers();
-    if (!myPlayer) {
-      $("player").value = data.display_name;
-      localStorage.setItem("fdCurrent", data.display_name);
-    }
-    render();
-    toast(data.display_name + " added");
-  } catch (err) {
-    console.error("Player add failed:", err);
-    toast("Add failed: " + (err.message || String(err)));
-  }
-};
 
 $("player").onchange = () => { localStorage.setItem("fdCurrent", $("player").value); render(); };
 $("week").onchange = render;
 $("refresh").onclick = load;
+$("signOut").onclick = async () => { await sb.auth.signOut(); location.reload(); };
 $("save").onclick = () => { persist(); toast("Picks saved"); };
 
 async function startApp() {
-  await loadMyPlayer();
+  try { await loadMyPlayer(); } catch (e) { console.error("Player setup failed:", e); toast("Player setup failed: " + (e.message || e)); }
   try {
     await loadPlayers();
   } catch (e) {
