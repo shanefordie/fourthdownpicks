@@ -7,76 +7,88 @@
 <style>
 :root{
   color-scheme:dark;
-  --bg:#0b0d12;--surface:#141821;--surface-light:#1c2230;--border:#2a3140;
-  --text:#f4f6fa;--muted:#929bad;--orange:#ff782e;--orange-light:#ff9a5b;
-  --panel:#111827;--line:#29354c;--accent:#34d399;--blue:#60a5fa
+  --bg:#0a0a0b;--surface:#111113;--surface-2:#17171a;--border:#222226;--border-strong:#34343a;
+  --text:#ededef;--muted:#8a8a93;--accent:#8ab4ff;
+  --radius:14px;
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Inter,system-ui,sans-serif
 }
 *{box-sizing:border-box}
-body{margin:0;background:radial-gradient(circle at 50% -10%,#1d2a45,#070b14 45%);background-color:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased}
-header,.wrap{max-width:1100px;margin:auto;padding-left:18px;padding-right:18px}
-header{padding-top:26px}
-.eyebrow{font-size:12px;font-weight:900;letter-spacing:.18em;color:var(--accent)}
-h1{font-size:36px;margin:7px 0}
-.sub{color:var(--muted)}
-.top{display:flex;gap:9px;flex-wrap:wrap;margin:18px 0}
-.control{background:var(--panel);border:1px solid var(--line);color:var(--text);padding:11px 13px;border-radius:11px;font-weight:800}
-.grid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px}
-@media(max-width:800px){.grid{grid-template-columns:1fr}h1{font-size:30px}}
-.card{background:#111827f5;border:1px solid var(--line);border-radius:17px;overflow:hidden}
-.head{padding:17px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
-.head h2{margin:0;font-size:17px}
-.pill{font-size:11px;padding:6px 9px;border-radius:999px;background:#182235;color:var(--muted);font-weight:900}
-.side{padding:16px}
-.sideTitle{font-size:13px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
-.section{padding-bottom:16px;margin-bottom:16px;border-bottom:1px solid var(--line)}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.5;-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;transition:background .15s ease,border-color .15s ease,color .15s ease}
+button:disabled,select:disabled{cursor:not-allowed;opacity:.5}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+header,.wrap{max-width:1040px;margin:auto;padding-left:20px;padding-right:20px}
+header{padding-top:40px}
+.eyebrow{font-size:11px;font-weight:600;letter-spacing:.16em;color:var(--muted);text-transform:uppercase}
+h1{font-size:34px;font-weight:650;letter-spacing:-.03em;margin:8px 0 6px}
+.sub{color:var(--muted);font-size:15px}
+
+.top{display:flex;gap:8px;flex-wrap:wrap;margin:28px 0 20px}
+.control,input,select{background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:0 14px;min-height:42px;font-size:14px;font-weight:500}
+select{padding-right:10px}
+button.control:hover,select:hover{border-color:var(--border-strong);background:var(--surface-2)}
+input::placeholder{color:#5c5c64}
+input:focus{border-color:var(--accent);outline:none}
+
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:20px;padding-bottom:60px}
+@media(max-width:800px){.grid{grid-template-columns:1fr}h1{font-size:28px}header{padding-top:28px}}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.head h2,#weekTitle{margin:0;font-size:16px;font-weight:600;letter-spacing:-.01em}
+.pill{font-size:12px;padding:4px 10px;border-radius:999px;border:1px solid var(--border);color:var(--muted);font-weight:500}
+#picked{color:var(--text)}
+
+#games{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:12px;padding:16px}
+.game{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:14px;min-width:0}
+.time{color:var(--muted);font-size:12px;margin-bottom:12px}
+.teams{display:grid;grid-template-columns:minmax(0,1fr) 16px minmax(0,1fr);align-items:stretch;gap:6px}
+.team{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 6px;min-width:0;min-height:84px;text-align:center}
+.team:hover:not(:disabled){border-color:var(--border-strong);background:var(--surface-2)}
+.team.selected{background:var(--surface-2);border:1px solid var(--text);box-shadow:0 0 0 1px var(--text) inset}
+.abbr{font-size:20px;font-weight:650;letter-spacing:-.01em;margin-bottom:2px}
+.name{font-size:12px;color:var(--muted);line-height:1.3;overflow-wrap:anywhere}
+.team.selected .name{color:var(--text)}
+.at{color:var(--muted);font-size:11px;align-self:center;text-align:center}
+.lock{color:var(--muted);font-size:12px;margin-top:12px}
+
+.side{padding:20px}
+.sideTitle{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.12em;margin-bottom:12px}
+.section{padding-bottom:20px;margin-bottom:20px;border-bottom:1px solid var(--border)}
 .section:last-child{border-bottom:0;margin-bottom:0;padding-bottom:0}
-.player{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)}
-.pname{font-weight:850}
-.small{font-size:11px;color:var(--muted)}
-.row{display:flex;gap:8px;margin-top:10px}
-.row input{flex:1;min-width:0}
-.row button,.remove{border:0;border-radius:9px;padding:8px 10px;font-weight:900}
-.progress{height:7px;background:#243047;border-radius:99px;overflow:hidden;margin-top:10px}
-.progress div{height:100%;background:var(--accent);width:0}
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);display:none;z-index:50}
+.player{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
+.player:last-child{border-bottom:0}
+.pname{font-weight:550;font-size:14px}
+.small{font-size:12px;color:var(--muted)}
+.progress{height:4px;background:var(--border);border-radius:99px;overflow:hidden;margin-top:12px}
+.progress div{height:100%;background:var(--accent);width:0;transition:width .3s ease}
 
-h1,h2,h3{color:var(--text);letter-spacing:-0.5px}
-button,input,select{font:inherit}
-button{cursor:pointer;transition:background .18s ease,border-color .18s ease,transform .18s ease}
-button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--orange);outline-offset:3px}
-button:disabled,select:disabled{cursor:not-allowed;opacity:.55}
-input,select{background:var(--surface-light);color:var(--text);border:1px solid var(--border);border-radius:10px;padding:11px 13px;min-height:44px}
-input:focus,select:focus{border-color:var(--orange)}
-
-#games{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,290px),1fr));gap:14px;padding:16px}
-.game{background:linear-gradient(145deg,#191e29,#12161e);border:1px solid var(--border);border-radius:16px;padding:17px;min-width:0;box-shadow:0 5px 18px rgba(0,0,0,.12);transition:border-color .2s ease,transform .2s ease}
-.game:hover{border-color:#424b5d;transform:translateY(-2px)}
-.time{color:var(--muted);font-size:12px;font-weight:600;margin-bottom:15px}
-.teams{display:grid;grid-template-columns:minmax(0,1fr) 20px minmax(0,1fr);align-items:stretch;gap:8px}
-.team{background:#202634;color:var(--text);border:1px solid #30394a;border-radius:12px;padding:14px 6px;min-width:0;min-height:95px}
-.team:hover:not(:disabled){background:#292f3d;border-color:var(--orange)}
-.team.selected{background:rgba(255,120,46,.13);border:2px solid var(--orange);padding:13px 5px;box-shadow:inset 0 0 16px rgba(255,120,46,.06)}
-.abbr{font-size:20px;font-weight:800;letter-spacing:.5px;margin-bottom:5px}
-.team.selected .abbr{color:var(--orange-light)}
-.name{font-size:12px;font-weight:600;line-height:1.35;overflow-wrap:anywhere}
-.at{color:var(--muted);font-size:12px;font-weight:700;align-self:center;text-align:center}
-.lock{color:var(--muted);font-size:11px;margin-top:14px;padding-top:11px;border-top:1px solid var(--border)}
-#picked{color:var(--orange-light);font-weight:700}
-#weekTitle{font-size:clamp(22px,5vw,30px);font-weight:800}
-#playerList .player,#leaderboard .player{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:8px}
-.pname{color:var(--text);font-weight:600}
-button.remove{background:#302027;color:#ff9a9a;border:1px solid #59313b;border-radius:8px;padding:7px 10px}
-button.remove:hover{background:#482832}
-#add,#save,#refresh,#signIn,#signUp{background:var(--orange);color:#17110d;border:1px solid var(--orange);border-radius:10px;padding:10px 15px;font-weight:750}
-#add:hover,#save:hover,#refresh:hover,#signIn:hover,#signUp:hover{background:var(--orange-light);border-color:var(--orange-light)}
-#toast{background:var(--surface-light);color:var(--text);border:1px solid var(--orange);border-radius:12px;padding:12px 16px;box-shadow:0 8px 28px rgba(0,0,0,.3);font-weight:700}
-#authBox{max-width:400px;margin:40px auto;padding:24px;background:var(--panel);border-radius:12px}
+#signIn,#signUp{border-radius:10px;padding:0 16px;min-height:42px;font-weight:600;font-size:14px;border:1px solid var(--border)}
+#signIn{background:var(--text);color:#0a0a0b;border-color:var(--text)}
+#signIn:hover{background:#fff}
+#signUp{background:transparent;color:var(--text)}
+#signUp:hover{border-color:var(--border-strong);background:var(--surface)}
+#save{background:var(--text);color:#0a0a0b;border-color:var(--text)}
+#save:hover{background:#fff}
+#authBox{max-width:380px;margin:12vh auto 0;padding:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius)}
+#authBox h2{margin:0 0 6px;font-size:20px;font-weight:650;letter-spacing:-.02em}
 #authBox input{display:block;width:100%;margin:10px 0}
-@media(max-width:480px){
-  #games{grid-template-columns:minmax(0,1fr);gap:12px;padding:12px}
-  .game{padding:14px}.team{min-height:88px}.abbr{font-size:18px}
-}
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;scroll-behavior:auto!important}}
+#authBox button{margin-right:6px;margin-top:4px}
+#authMessage{color:var(--muted);font-size:13px;min-height:1em}
+
+#nameBox{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.8);z-index:60;padding:20px}
+.namecard{width:100%;max-width:380px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:28px}
+.namecard h2{margin:0 0 6px;font-size:20px;font-weight:650;letter-spacing:-.02em}
+.namecard input{display:block;width:100%;margin:14px 0 10px}
+#saveName{background:var(--text);color:#0a0a0b;border:1px solid var(--text);border-radius:10px;padding:0 16px;min-height:42px;font-weight:600;font-size:14px}
+#nameMessage{color:var(--muted);font-size:13px;min-height:1em}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);display:none;z-index:50}
+#toast{background:var(--text);color:#0a0a0b;border-radius:999px;padding:10px 18px;font-size:13px;font-weight:600;box-shadow:0 8px 30px rgba(0,0,0,.5)}
+
+@media(max-width:480px){#games{grid-template-columns:minmax(0,1fr);padding:12px}.side{padding:16px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important}}
 </style>
 </head>
 <body>
@@ -88,6 +100,16 @@ button.remove:hover{background:#482832}
   <button id="signIn">Sign In</button>
   <button id="signUp">Create Account</button>
   <p id="authMessage"></p>
+</div>
+
+<div id="nameBox">
+  <div class="namecard">
+    <h2>Choose your display name</h2>
+    <p class="small">This is how you'll appear on the leaderboard. You only do this once.</p>
+    <input id="displayName" placeholder="Display name" maxlength="30" autocomplete="nickname">
+    <button id="saveName">Continue</button>
+    <p id="nameMessage"></p>
+  </div>
 </div>
 
 <div id="appContent" style="display:none !important;">
@@ -141,26 +163,34 @@ const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
 
 async function loadMyPlayer() {
-  const { data: { user } } = await sb.auth.getUser();
-  if (!user) return;
-  const { data: acct, error } = await sb.from("player_accounts").select("player_id").eq("user_id", user.id).maybeSingle();
+  const { data, error } = await sb.rpc("claim_my_player", { p_name: null });
   if (error) throw error;
+  if (data && data.length) { myPlayer = data[0].pname; return; }
+  await askForName();
+}
 
-  if (acct?.player_id) {
-    const { data: pl, error: nErr } = await sb.from("players").select("display_name").eq("id", acct.player_id).single();
-    if (nErr) throw nErr;
-    myPlayer = pl.display_name;
-    return;
-  }
-
-  // First sign-in: create this user's player and link it to their account
-  const suggested = (user.email || "Player").split("@")[0];
-  const name = (prompt("Pick a display name for the leaderboard:", suggested) || suggested).trim().slice(0, 30);
-  const { data: pl, error: pErr } = await sb.from("players").insert({ display_name: name }).select("id,display_name").single();
-  if (pErr) throw pErr;
-  const { error: aErr } = await sb.from("player_accounts").insert({ user_id: user.id, player_id: pl.id });
-  if (aErr) throw aErr;
-  myPlayer = pl.display_name;
+function askForName() {
+  return new Promise(resolve => {
+    const box = $("nameBox");
+    box.style.display = "flex";
+    $("displayName").focus();
+    const submit = async () => {
+      const name = $("displayName").value.trim();
+      if (!name) { $("nameMessage").textContent = "Enter a name."; return; }
+      $("saveName").disabled = true;
+      const { data, error } = await sb.rpc("claim_my_player", { p_name: name });
+      $("saveName").disabled = false;
+      if (error) {
+        $("nameMessage").textContent = error.code === "23505" ? "That name is taken. Try another." : "Error: " + error.message;
+        return;
+      }
+      myPlayer = data[0].pname;
+      box.style.display = "none";
+      resolve();
+    };
+    $("saveName").onclick = submit;
+    $("displayName").onkeydown = e => { if (e.key === "Enter") submit(); };
+  });
 }
 
 async function loadPlayers() {
@@ -201,38 +231,34 @@ function populatePlayers() {
 }
 
 async function syncGamesToDatabase() {
-  const weekIds = {};
   const { data: weeks, error: weekError } = await sb.from("weeks").select("id, week_number");
   if (weekError) throw weekError;
-  weeks.forEach(w => { weekIds[w.week_number] = w.id; });
-
-  for (const e of events) {
-    const w = weekNo(e.date);
-    if (!weekIds[w]) continue; // no matching week row in the database
+  const weekIds = Object.fromEntries(weeks.map(w => [w.week_number, w.id]));
+  const rows = events.map(e => {
     const t = teams(e);
-    const { error } = await sb.from("games").upsert({
+    return {
       espn_event_id: e.id,
-      week_id: weekIds[w],
+      week_id: weekIds[weekNo(e.date)],
       home_team: t.h.team.displayName,
       away_team: t.a.team.displayName,
       kickoff_at: e.date
-    }, { onConflict: "espn_event_id" });
-    if (error) throw error;
-  }
-  await loadSharedPicks();
+    };
+  }).filter(r => r.week_id);
+  if (!rows.length) return;
+  const { error } = await sb.from("games").upsert(rows, { onConflict: "espn_event_id" });
+  if (error) throw error;
 }
 
 async function load() {
-  $("games").innerHTML = "<div style='padding:22px;color:#94a3b8'>Loading the 2026 NFL schedule…</div>";
+  $("games").innerHTML = "<div style='padding:22px;color:var(--muted)'>Loading the 2026 NFL schedule…</div>";
   try {
     const r = await fetch("https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?dates=2026&seasontype=2&limit=500");
     const d = await r.json();
     events = d.events || [];
 
-    syncGamesToDatabase().catch(e => {
-      console.error("Game sync failed:", e);
-      toast("Database sync failed");
-    });
+    syncGamesToDatabase()
+      .catch(e => { console.error("Game sync failed:", e); toast("Game sync failed: " + (e.message || e)); })
+      .finally(() => loadSharedPicks());
 
     const ws = [...new Set(events.map(e => weekNo(e.date)))].sort((a, b) => a - b);
     $("week").innerHTML = ws.map(w => `<option value="${w}">Week ${w}</option>`).join("");
@@ -245,8 +271,13 @@ async function load() {
 }
 
 async function loadSharedPicks() {
-  const { data, error } = await sb.from("picks").select("player_id, game_id, selected_team");
-  if (error) { console.error("Shared picks failed to load:", error); toast("Couldn't load shared picks"); return; }
+  let data = [];
+  for (let from = 0; ; from += 1000) {
+    const { data: page, error } = await sb.from("picks").select("player_id, game_id, selected_team").range(from, from + 999);
+    if (error) { console.error("Shared picks failed to load:", error); toast("Couldn't load shared picks: " + error.message); return; }
+    data = data.concat(page);
+    if (page.length < 1000) break;
+  }
 
   const { data: playerRows, error: playerError } = await sb.from("players").select("id, display_name");
   if (playerError) { console.error("Players failed to load:", playerError); return; }
@@ -282,7 +313,7 @@ function render() {
       <div class="at">@</div>
       <button class="team home ${pk === t.h.id ? "selected" : ""}" ${isLocked ? "disabled" : ""} onclick="choose('${e.id}','${t.h.id}')"><div class="abbr">${esc(t.h.abbreviation || "")}</div><div class="name">${esc(t.h.team.displayName)}</div></button>
       </div><div class="lock">${over ? "🔒 Game started/final · picks locked" : notMine ? "Viewing " + esc(p) + "'s picks" : pk ? "✓ Pick saved" : "Tap a team to pick the winner"}</div></div>`;
-  }).join("") || "<div style='padding:22px;color:#94a3b8'>No games this week.</div>";
+  }).join("") || "<div style='padding:22px;color:var(--muted)'>No games this week.</div>";
   $("picked").textContent = `${count} / ${gs.length} picked`;
   updateBoard();
 }
@@ -341,8 +372,8 @@ function updateBoard() {
 
   $("leaderboard").innerHTML = rows.map((x, i) => `
     <div class="player">
-      <div style="display:flex;align-items:center;gap:10px">
-        <span style="font-size:20px;font-weight:800;color:${i===0?"#ff9a5b":i===1?"#c4ccd8":i===2?"#cd9168":"#929bad"}">${i===0?"🥇":i===1?"🥈":i===2?"🥉":(i+1)+"."}</span>
+      <div style="display:flex;align-items:center;gap:12px">
+        <span style="width:16px;font-size:13px;font-weight:600;color:${i===0?"var(--text)":"var(--muted)"}">${i+1}</span>
         <div>
           <div class="pname">${esc(x.p)}</div>
           <div class="small">${x.accuracy}% accuracy</div>
