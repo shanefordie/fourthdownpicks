@@ -9,7 +9,7 @@
   color-scheme:dark;
   --bg:#0a0a0b;--surface:#111113;--surface-2:#17171a;--border:#222226;--border-strong:#34343a;
   --text:#ededef;--muted:#8a8a93;--accent:#ff7a3d;--accent-2:#ffb347;--accent-soft:rgba(255,122,61,.12);--grad:linear-gradient(135deg,#ff7a3d,#ffb347);--accent-glow:rgba(255,122,61,.15);--accent-a35:rgba(255,122,61,.35);--accent-a55:rgba(255,122,61,.55);--on-accent:#14110d;
-  --radius:14px;
+  --radius:14px;--good:#34d399;--bad:#f87171;
   --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Inter,system-ui,sans-serif
 }
 *{box-sizing:border-box}
@@ -62,6 +62,33 @@ input:focus{border-color:var(--accent);outline:none}
 .odds b{color:var(--text);font-weight:600}
 .wp{display:flex;height:4px;border-radius:99px;overflow:hidden;background:var(--border-strong);margin-top:10px}
 .wp i{display:block;background:var(--grad)}
+.tabs{display:flex;align-items:center;gap:4px;padding:0 20px;border-bottom:1px solid var(--border)}
+.tab{background:none;border:0;border-bottom:2px solid transparent;color:var(--muted);padding:12px;font-weight:600;font-size:14px;margin-bottom:-1px}
+.tab:hover{color:var(--text)}
+.tab.on{color:var(--text);border-bottom-color:var(--accent)}
+.livepill{margin-left:auto;font-size:12px;font-weight:600;color:var(--bad)}
+.livedot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--bad);margin-right:6px;animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.3}}
+.livetxt{color:var(--bad);font-weight:600}
+.tscore{font-size:18px;font-weight:650;margin-top:6px}
+.ok{color:var(--good);font-weight:600}
+.bad{color:var(--bad);font-weight:600}
+.rvhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.rvtitle{font-size:15px;font-weight:650}
+.scoreline{font-size:13px;color:var(--muted);margin-bottom:10px}
+.scoreline b{color:var(--text);font-size:15px}
+.rvsplit{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-top:4px}
+.rvsplit b{color:var(--text)}
+.rvbar{display:flex;height:6px;border-radius:99px;overflow:hidden;background:var(--border-strong);margin:8px 0 12px}
+.rvbar i{display:block}
+.rvgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.rvp{border:1px solid var(--border);border-radius:10px;padding:8px 10px;min-width:0}
+.rvp.me{border-color:var(--accent)}
+.rvname{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:6px}
+.rvrow{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.chip{font-size:12px;font-weight:650;padding:2px 10px;border-radius:99px;border:1px solid var(--border-strong);background:var(--surface-2)}
+.chip.home{border-color:var(--accent);background:var(--accent-soft)}
+.rvlock{font-size:13px;color:var(--muted);padding:8px 0 2px}
 .lock{color:var(--muted);font-size:12px;margin-top:12px}
 
 .side{padding:20px}
@@ -98,7 +125,7 @@ input:focus{border-color:var(--accent);outline:none}
 #toast{background:var(--grad);color:var(--on-accent);border-radius:999px;padding:10px 18px;font-size:13px;font-weight:600;box-shadow:0 8px 30px rgba(0,0,0,.5)}
 
 @media(max-width:480px){#games{grid-template-columns:minmax(0,1fr);padding:12px}.side{padding:16px}}
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
 </style>
 </head>
 <body>
@@ -144,6 +171,11 @@ input:focus{border-color:var(--accent);outline:none}
     <div class="grid">
       <div class="card">
         <div class="head"><h2 id="weekTitle"></h2><span class="pill" id="picked"></span></div>
+        <div class="tabs">
+          <button id="tabPicks" class="tab on">Picks</button>
+          <button id="tabReveal" class="tab">Reveal</button>
+          <span id="livePill" class="livepill" hidden><span class="livedot"></span>Live</span>
+        </div>
         <div id="games"></div>
         <div id="oddsNote" class="small" style="padding:0 20px 16px">Odds from ESPN (DraftKings). Win % is the moneyline with the sportsbook margin removed. For fun only.</div>
       </div>
@@ -406,20 +438,107 @@ function render() {
   let count = 0;
   $("weekTitle").textContent = `Week ${w}`;
   $("games").innerHTML = gs.map(e => {
-    const t = teams(e), pk = picks[p]?.[e.id], over = locked(e), notMine = !!myPlayer && p !== myPlayer, isLocked = over || notMine, favHit = !!fav && (t.a.abbreviation === fav || t.h.abbreviation === fav);
+    const t = teams(e), pk = picks[p]?.[e.id], over = locked(e), notMine = !!myPlayer && p !== myPlayer, isLocked = over || notMine, favHit = !!fav && (t.a.abbreviation === fav || t.h.abbreviation === fav), started = gameState(e) !== "pre", live = gameState(e) === "in";
     const od = showOdds ? oddsInfo(e) : null;
     const oddsRow = od ? `<div class="odds"><span>${od.details ? "<b>" + esc(od.details) + "</b>" : ""}</span>${od.ou ? `<span>O/U <b>${od.ou}</b></span>` : ""}${od.a != null && od.h != null ? `<span>ML <b>${fmtML(od.a)}</b> / <b>${fmtML(od.h)}</b></span>` : ""}</div>${od.pa != null ? `<div class="wp"><i style="width:${od.pa}%"></i></div>` : ""}` : "";
     if (pk) count++;
-    return `<div class="game ${favHit ? "fav" : ""}"><div class="time">${fmt(e.date)} · ${e.status?.type?.shortDetail || ""}</div><div class="teams">
-      <button class="team ${pk === t.a.id ? "selected" : ""}" ${isLocked ? "disabled" : ""} onclick="choose('${e.id}','${t.a.id}')"><div class="abbr">${esc(t.a.abbreviation || "")}</div><div class="name">${esc(t.a.team.displayName)}</div>${od && od.pa != null ? `<div class="pct">${od.pa}%</div>` : ""}</button>
+    return `<div class="game ${favHit ? "fav" : ""}"><div class="time">${live ? '<span class="livedot"></span><span class="livetxt">' + esc(e.status.type.shortDetail || "Live") + "</span>" : fmt(e.date) + " · " + (e.status?.type?.shortDetail || "")}</div><div class="teams">
+      <button class="team ${pk === t.a.id ? "selected" : ""}" ${isLocked ? "disabled" : ""} onclick="choose('${e.id}','${t.a.id}')"><div class="abbr">${esc(t.a.abbreviation || "")}</div><div class="name">${esc(t.a.team.displayName)}</div>${started ? `<div class="tscore">${t.a.score ?? 0}</div>` : ""}${od && od.pa != null ? `<div class="pct">${od.pa}%</div>` : ""}</button>
       <div class="at">@</div>
-      <button class="team home ${pk === t.h.id ? "selected" : ""}" ${isLocked ? "disabled" : ""} onclick="choose('${e.id}','${t.h.id}')"><div class="abbr">${esc(t.h.abbreviation || "")}</div><div class="name">${esc(t.h.team.displayName)}</div>${od && od.ph != null ? `<div class="pct">${od.ph}%</div>` : ""}</button>
-      </div>${oddsRow}<div class="lock">${over ? "🔒 Game started/final · picks locked" : notMine ? "Viewing " + esc(p) + "'s picks" : pk ? "✓ Pick saved" : "Tap a team to pick the winner"}</div></div>`;
+      <button class="team home ${pk === t.h.id ? "selected" : ""}" ${isLocked ? "disabled" : ""} onclick="choose('${e.id}','${t.h.id}')"><div class="abbr">${esc(t.h.abbreviation || "")}</div><div class="name">${esc(t.h.team.displayName)}</div>${started ? `<div class="tscore">${t.h.score ?? 0}</div>` : ""}${od && od.ph != null ? `<div class="pct">${od.ph}%</div>` : ""}</button>
+      </div>${oddsRow}<div class="lock">${over ? "🔒 Picks locked" + pickStatus(e, t, pk) : notMine ? "Viewing " + esc(p) + "'s picks" : pk ? "✓ Pick saved" : "Tap a team to pick the winner"}</div></div>`;
   }).join("") || "<div style='padding:22px;color:var(--muted)'>No games this week.</div>";
+  if (view === "reveal") $("games").innerHTML = revealHTML(gs) || "<div style='padding:22px;color:var(--muted)'>No games this week.</div>";
+  $("livePill").hidden = !events.some(e => gameState(e) === "in");
   $("oddsNote").hidden = !showOdds;
   $("picked").textContent = `${count} / ${gs.length} picked`;
   updateBoard();
 }
+
+const LIVE_URL = "https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard";
+let view = "picks";
+const gameState = e => e.status?.type?.state || "pre";
+const teamAbbr = (t, id) => id === t.a.id ? t.a.abbreviation : id === t.h.id ? t.h.abbreviation : null;
+const winnerId = e => e.competitions?.[0]?.competitors?.find(x => x.winner)?.id;
+function leaderId(e, t) {
+  if (gameState(e) === "pre") return null;
+  const a = Number(t.a.score), h = Number(t.h.score);
+  if (isNaN(a) || isNaN(h)) return null;
+  return a > h ? t.a.id : h > a ? t.h.id : "tie";
+}
+function pickStatus(e, t, pk) {
+  if (!pk || gameState(e) === "pre") return "";
+  if (e.status?.type?.completed) {
+    const w = winnerId(e);
+    if (!w) return "";
+    return w === pk ? ' · <span class="ok">Correct</span>' : ' · <span class="bad">Wrong</span>';
+  }
+  const lead = leaderId(e, t);
+  if (lead === "tie") return " · Tied";
+  return lead === pk ? ' · <span class="ok">Winning</span>' : ' · <span class="bad">Losing</span>';
+}
+function revealHTML(gs) {
+  return gs.map(e => {
+    const t = teams(e), st = gameState(e), live = st === "in", done = !!e.status?.type?.completed;
+    const status = live ? `<span class="livedot"></span><span class="livetxt">${esc(e.status.type.shortDetail || "Live")}</span>` : done ? "Final" : fmt(e.date);
+    const scoreHtml = st !== "pre" ? `<div class="scoreline">${esc(t.a.abbreviation)} <b>${t.a.score ?? 0}</b> – <b>${t.h.score ?? 0}</b> ${esc(t.h.abbreviation)}</div>` : "";
+    let body;
+    if (!locked(e)) {
+      body = '<div class="rvlock">Picks reveal at kickoff</div>';
+    } else {
+      const rows = players.map(p => { const id = picks[p]?.[e.id]; return { p, id, abbr: id ? teamAbbr(t, id) : null }; });
+      const made = rows.filter(r => r.abbr);
+      const nA = made.filter(r => r.id === t.a.id).length, nH = made.length - nA;
+      const pA = made.length ? Math.round(nA / made.length * 100) : 0;
+      const minId = nA < nH ? t.a.id : t.h.id, nMin = Math.min(nA, nH);
+      const ref = done ? winnerId(e) : (live ? leaderId(e, t) : null);
+      const bar = made.length
+        ? `<div class="rvsplit"><span>${esc(t.a.abbreviation)} <b>${pA}%</b></span><span><b>${100 - pA}%</b> ${esc(t.h.abbreviation)}</span></div><div class="rvbar"><i style="width:${pA}%;background:var(--muted)"></i><i style="width:${100 - pA}%;background:var(--accent)"></i></div>`
+        : '<div class="rvlock">No picks were made for this game</div>';
+      const chips = rows.map(r => {
+        const res = r.abbr && ref && ref !== "tie" ? (r.id === ref ? '<span class="ok">✓</span>' : '<span class="bad">✗</span>') : "";
+        const wolf = made.length >= 3 && nMin === 1 && r.abbr && r.id === minId;
+        const tag = wolf ? `<div class="small" style="margin-top:6px">${done && r.id === ref ? "Called the upset" : "Lone wolf"}</div>` : "";
+        return `<div class="rvp ${r.p === myPlayer ? "me" : ""}"><div class="rvname">${esc(r.p)}</div><div class="rvrow">${r.abbr ? `<span class="chip ${r.id === t.h.id ? "home" : ""}">${esc(r.abbr)}</span>` : '<span class="small">No pick</span>'}${res}</div>${tag}</div>`;
+      }).join("");
+      body = bar + `<div class="rvgrid">${chips}</div>`;
+    }
+    return `<div class="game"><div class="rvhead"><span class="rvtitle">${esc(t.a.abbreviation)} @ ${esc(t.h.abbreviation)}</span><span class="time" style="margin:0">${status}</span></div>${scoreHtml}${body}</div>`;
+  }).join("");
+}
+
+function hasLive() {
+  const now = Date.now();
+  return events.some(e => {
+    const s = gameState(e), dt = new Date(e.date) - now;
+    return s === "in" || (s === "pre" && dt < 600000 && dt > -10800000);
+  });
+}
+async function refreshLive() {
+  try {
+    const before = events.filter(locked).length;
+    const r = await fetch(LIVE_URL);
+    const d = await r.json();
+    const byId = Object.fromEntries((d.events || []).map(e => [e.id, e]));
+    events = events.map(e => byId[e.id] || e);
+    render();
+    if (events.filter(locked).length !== before) loadSharedPicks();
+  } catch (err) {
+    console.error("Live refresh failed:", err);
+  }
+}
+setInterval(() => { if (!document.hidden && hasLive()) refreshLive(); }, 30000);
+document.addEventListener("visibilitychange", () => { if (!document.hidden && hasLive()) refreshLive(); });
+
+function setView(v) {
+  view = v;
+  $("tabPicks").classList.toggle("on", v === "picks");
+  $("tabReveal").classList.toggle("on", v === "reveal");
+  render();
+  if (v === "reveal") loadSharedPicks();
+}
+$("tabPicks").onclick = () => setView("picks");
+$("tabReveal").onclick = () => setView("reveal");
 
 window.choose = async (id, team) => {
   const e = events.find(x => x.id === id);
