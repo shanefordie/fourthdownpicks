@@ -426,8 +426,9 @@ async function loadSharedPicks() {
     const eventId = eventIds[pick.game_id];
     if (!name || !eventId) continue;
     shared[name] ??= {};
-    shared[name][eventId] = pick.selected_team;
+    shared[name][String(eventId)] = String(pick.selected_team);
   }
+  pickRows = data.length;
   picks = shared;
   render();
 }
@@ -457,6 +458,7 @@ function render() {
 
 const LIVE_URL = "https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard";
 let view = "picks";
+let pickRows = null;
 const gameState = e => e.status?.type?.state || "pre";
 const teamAbbr = (t, id) => id === t.a.id ? t.a.abbreviation : id === t.h.id ? t.h.abbreviation : null;
 const winnerId = e => e.competitions?.[0]?.competitors?.find(x => x.winner)?.id;
@@ -504,7 +506,7 @@ function revealHTML(gs) {
       body = bar + `<div class="rvgrid">${chips}</div>`;
     }
     return `<div class="game"><div class="rvhead"><span class="rvtitle">${esc(t.a.abbreviation)} @ ${esc(t.h.abbreviation)}</span><span class="time" style="margin:0">${status}</span></div>${scoreHtml}${body}</div>`;
-  }).join("");
+  }).join("") + `<div class="small" style="grid-column:1/-1;padding:2px 2px 0">Debug: ${pickRows === null ? "picks not loaded yet" : pickRows + " picks loaded from the database"}</div>`;
 }
 
 function hasLive() {
