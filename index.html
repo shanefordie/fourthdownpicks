@@ -352,7 +352,12 @@ function fmt(x) {
 }
 function teams(e) {
   const c = e.competitions[0];
-  return { a: c.competitors.find(x => x.homeAway === "away"), h: c.competitors.find(x => x.homeAway === "home") };
+  const side = ha => {
+    const x = c.competitors.find(y => y.homeAway === ha);
+    if (x && !x.abbreviation) x.abbreviation = x.team?.abbreviation || "";
+    return x;
+  };
+  return { a: side("away"), h: side("home") };
 }
 function locked(e) { return !!e.status?.type?.completed || new Date(e.date) <= new Date(); }
 
@@ -506,7 +511,7 @@ function revealHTML(gs) {
       body = bar + `<div class="rvgrid">${chips}</div>`;
     }
     return `<div class="game"><div class="rvhead"><span class="rvtitle">${esc(t.a.abbreviation)} @ ${esc(t.h.abbreviation)}</span><span class="time" style="margin:0">${status}</span></div>${scoreHtml}${body}</div>`;
-  }).join("") + `<div class="small" style="grid-column:1/-1;padding:2px 2px 0">Debug: ${pickRows === null ? "picks not loaded yet" : pickRows + " picks loaded from the database"}</div>`;
+  }).join("");
 }
 
 function hasLive() {
