@@ -57,6 +57,11 @@ input:focus{border-color:var(--accent);outline:none}
 .name{font-size:12px;color:var(--muted);line-height:1.3;overflow-wrap:anywhere}
 .team.selected .name{color:var(--text)}
 .at{color:var(--muted);font-size:11px;align-self:center;text-align:center}
+.pct{font-size:12px;font-weight:650;color:var(--accent-2);margin-top:6px}
+.odds{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 10px;margin-top:12px;font-size:12px;color:var(--muted)}
+.odds b{color:var(--text);font-weight:600}
+.wp{display:flex;height:4px;border-radius:99px;overflow:hidden;background:var(--border-strong);margin-top:10px}
+.wp i{display:block;background:var(--grad)}
 .lock{color:var(--muted);font-size:12px;margin-top:12px}
 
 .side{padding:20px}
@@ -131,6 +136,7 @@ input:focus{border-color:var(--accent);outline:none}
       <select id="player" class="control" aria-label="Player"></select>
       <select id="week" class="control" aria-label="Week"></select>
       <select id="team" class="control" aria-label="Favorite team"></select>
+      <button id="oddsToggle" class="control"></button>
       <button id="refresh" class="control">Refresh</button>
       <button id="save" class="control">Save</button>
       <button id="signOut" class="control">Sign out</button>
@@ -139,6 +145,7 @@ input:focus{border-color:var(--accent);outline:none}
       <div class="card">
         <div class="head"><h2 id="weekTitle"></h2><span class="pill" id="picked"></span></div>
         <div id="games"></div>
+        <div id="oddsNote" class="small" style="padding:0 20px 16px">Odds from ESPN (DraftKings). Win % is the moneyline with the sportsbook margin removed. For fun only.</div>
       </div>
       <div class="card side">
         <div class="section">
@@ -189,6 +196,29 @@ const TEAMS = {
 };
 const DEFAULT_THEME = ["#ff7a3d", "#ffb347"];
 let fav = "";
+let showOdds = localStorage.getItem("fdOdds") !== "0";
+
+const parseML = x => {
+  if (x == null) return null;
+  const t = String(x).trim().toUpperCase();
+  if (t === "EVEN") return 100;
+  const n = parseFloat(t.replace("+", ""));
+  return isNaN(n) ? null : n;
+};
+const mlProb = m => m < 0 ? (-m) / (-m + 100) : 100 / (m + 100);
+const fmtML = n => n > 0 ? "+" + n : String(n);
+function oddsInfo(e) {
+  const o = e.competitions?.[0]?.odds?.[0];
+  if (!o) return null;
+  const h = parseML(o.moneyline?.home?.close?.odds), a = parseML(o.moneyline?.away?.close?.odds);
+  let ph = null, pa = null;
+  if (h != null && a != null) {
+    const rh = mlProb(h), ra = mlProb(a);
+    ph = Math.round(rh / (rh + ra) * 100);
+    pa = 100 - ph;
+  }
+  return { details: o.details, ou: o.overUnder, h, a, ph, pa };
+}
 
 const hexToRgb = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
 const rgba = (h, a) => `rgba(${hexToRgb(h).join(",")},${a})`;
@@ -377,13 +407,16 @@ function render() {
   $("weekTitle").textContent = `Week ${w}`;
   $("games").innerHTML = gs.map(e => {
     const t = teams(e), pk = picks[p]?.[e.id], over = locked(e), notMine = !!myPlayer && p !== myPlayer, isLocked = over || notMine, favHit = !!fav && (t.a.abbreviation === fav || t.h.abbreviation === fav);
+    const od = showOdds ? oddsInfo(e) : null;
+    const oddsRow = od ? `<div class="odds"><span>${od.details ? "<b>" + esc(od.details) + "</b>" : ""}</span>${od.ou ? `<span>O/U <b>${od.ou}</b></span>` : ""}${od.a != null && od.h != null ? `<span>ML <b>${fmtML(od.a)}</b> / <b>${fmtML(od.h)}</b></span>` : ""}</div>${od.pa != null ? `<div class="wp"><i style="width:${od.pa}%"></i></div>` : ""}` : "";
     if (pk) count++;
     return `<div class="game ${favHit ? "fav" : ""}"><div class="time">${fmt(e.date)} · ${e.status?.type?.shortDetail || ""}</div><div class="teams">
-      <button class="team ${pk === t.a.id ? "selected" : ""}" ${isLocked ? "disabled" : ""} onclick="choose('${e.id}','${t.a.id}')"><div class="abbr">${esc(t.a.abbreviation || "")}</div><div class="name">${esc(t.a.team.displayName)}</div></button>
+      <button class="team ${pk === t.a.id ? "selected" : ""}" ${isLocked ? "disabled" : ""} onclick="choose('${e.id}','${t.a.id}')"><div class="abbr">${esc(t.a.abbreviation || "")}</div><div class="name">${esc(t.a.team.displayName)}</div>${od && od.pa != null ? `<div class="pct">${od.pa}%</div>` : ""}</button>
       <div class="at">@</div>
-      <button class="team home ${pk === t.h.id ? "selected" : ""}" ${isLocked ? "disabled" : ""} onclick="choose('${e.id}','${t.h.id}')"><div class="abbr">${esc(t.h.abbreviation || "")}</div><div class="name">${esc(t.h.team.displayName)}</div></button>
-      </div><div class="lock">${over ? "🔒 Game started/final · picks locked" : notMine ? "Viewing " + esc(p) + "'s picks" : pk ? "✓ Pick saved" : "Tap a team to pick the winner"}</div></div>`;
+      <button class="team home ${pk === t.h.id ? "selected" : ""}" ${isLocked ? "disabled" : ""} onclick="choose('${e.id}','${t.h.id}')"><div class="abbr">${esc(t.h.abbreviation || "")}</div><div class="name">${esc(t.h.team.displayName)}</div>${od && od.ph != null ? `<div class="pct">${od.ph}%</div>` : ""}</button>
+      </div>${oddsRow}<div class="lock">${over ? "🔒 Game started/final · picks locked" : notMine ? "Viewing " + esc(p) + "'s picks" : pk ? "✓ Pick saved" : "Tap a team to pick the winner"}</div></div>`;
   }).join("") || "<div style='padding:22px;color:var(--muted)'>No games this week.</div>";
+  $("oddsNote").hidden = !showOdds;
   $("picked").textContent = `${count} / ${gs.length} picked`;
   updateBoard();
 }
@@ -459,6 +492,9 @@ function updateBoard() {
 
 $("player").onchange = () => { localStorage.setItem("fdCurrent", $("player").value); render(); };
 $("week").onchange = render;
+const syncOddsBtn = () => { $("oddsToggle").textContent = "Odds: " + (showOdds ? "On" : "Off"); };
+$("oddsToggle").onclick = () => { showOdds = !showOdds; localStorage.setItem("fdOdds", showOdds ? "1" : "0"); syncOddsBtn(); render(); };
+syncOddsBtn();
 $("refresh").onclick = load;
 $("signOut").onclick = async () => { await sb.auth.signOut(); location.reload(); };
 $("save").onclick = () => { persist(); toast("Picks saved"); };
