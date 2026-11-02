@@ -8,13 +8,14 @@
 :root{
   color-scheme:dark;
   --bg:#0a0a0b;--surface:#111113;--surface-2:#17171a;--border:#222226;--border-strong:#34343a;
-  --text:#ededef;--muted:#8a8a93;--accent:#8ab4ff;
+  --text:#ededef;--muted:#8a8a93;--accent:#ff7a3d;--accent-2:#ffb347;--accent-soft:rgba(255,122,61,.12);--grad:linear-gradient(135deg,#ff7a3d,#ffb347);--accent-glow:rgba(255,122,61,.15);--accent-a35:rgba(255,122,61,.35);--accent-a55:rgba(255,122,61,.55);--on-accent:#14110d;
   --radius:14px;
   --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Inter,system-ui,sans-serif
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.5;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;top:0;left:0;right:0;height:3px;background:var(--grad);z-index:100}
+body{margin:0;background:radial-gradient(900px 380px at 50% -120px,var(--accent-glow),transparent 70%),var(--bg);color:var(--text);font-family:var(--font);line-height:1.5;-webkit-font-smoothing:antialiased}
 button,input,select{font:inherit;color:inherit}
 button{cursor:pointer;transition:background .15s ease,border-color .15s ease,color .15s ease}
 button:disabled,select:disabled{cursor:not-allowed;opacity:.5}
@@ -22,14 +23,16 @@ button:disabled,select:disabled{cursor:not-allowed;opacity:.5}
 
 header,.wrap{max-width:1040px;margin:auto;padding-left:20px;padding-right:20px}
 header{padding-top:40px}
-.eyebrow{font-size:11px;font-weight:600;letter-spacing:.16em;color:var(--muted);text-transform:uppercase}
+.eyebrow{font-size:11px;font-weight:600;letter-spacing:.16em;color:var(--accent);text-transform:uppercase}
 h1{font-size:34px;font-weight:650;letter-spacing:-.03em;margin:8px 0 6px}
 .sub{color:var(--muted);font-size:15px}
 
+.hdr{display:flex;align-items:center;justify-content:space-between;gap:16px}
+#teamLogo{width:60px;height:60px;object-fit:contain;flex:none}
 .top{display:flex;gap:8px;flex-wrap:wrap;margin:28px 0 20px}
 .control,input,select{background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:0 14px;min-height:42px;font-size:14px;font-weight:500}
 select{padding-right:10px}
-button.control:hover,select:hover{border-color:var(--border-strong);background:var(--surface-2)}
+button.control:hover,select:hover{border-color:var(--accent-a55);background:var(--surface-2)}
 input::placeholder{color:#5c5c64}
 input:focus{border-color:var(--accent);outline:none}
 
@@ -39,15 +42,17 @@ input:focus{border-color:var(--accent);outline:none}
 .head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
 .head h2,#weekTitle{margin:0;font-size:16px;font-weight:600;letter-spacing:-.01em}
 .pill{font-size:12px;padding:4px 10px;border-radius:999px;border:1px solid var(--border);color:var(--muted);font-weight:500}
-#picked{color:var(--text)}
+#picked{color:var(--accent-2);border-color:var(--accent-a35);background:var(--accent-soft)}
 
 #games{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:12px;padding:16px}
 .game{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:14px;min-width:0}
+.game.fav{border-color:var(--accent-a55)}
 .time{color:var(--muted);font-size:12px;margin-bottom:12px}
 .teams{display:grid;grid-template-columns:minmax(0,1fr) 16px minmax(0,1fr);align-items:stretch;gap:6px}
 .team{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 6px;min-width:0;min-height:84px;text-align:center}
-.team:hover:not(:disabled){border-color:var(--border-strong);background:var(--surface-2)}
-.team.selected{background:var(--surface-2);border:1px solid var(--text);box-shadow:0 0 0 1px var(--text) inset}
+.team:hover:not(:disabled){border-color:var(--accent-a55);background:var(--surface-2)}
+.team.selected{background:var(--accent-soft);border:1px solid var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.team.selected .abbr{color:var(--accent-2)}
 .abbr{font-size:20px;font-weight:650;letter-spacing:-.01em;margin-bottom:2px}
 .name{font-size:12px;color:var(--muted);line-height:1.3;overflow-wrap:anywhere}
 .team.selected .name{color:var(--text)}
@@ -60,18 +65,18 @@ input:focus{border-color:var(--accent);outline:none}
 .section:last-child{border-bottom:0;margin-bottom:0;padding-bottom:0}
 .player{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
 .player:last-child{border-bottom:0}
+#leaderboard .player:first-child b{color:var(--accent-2)}
 .pname{font-weight:550;font-size:14px}
 .small{font-size:12px;color:var(--muted)}
 .progress{height:4px;background:var(--border);border-radius:99px;overflow:hidden;margin-top:12px}
-.progress div{height:100%;background:var(--accent);width:0;transition:width .3s ease}
+.progress div{height:100%;background:var(--grad);width:0;transition:width .3s ease}
 
 #signIn,#signUp{border-radius:10px;padding:0 16px;min-height:42px;font-weight:600;font-size:14px;border:1px solid var(--border)}
-#signIn{background:var(--text);color:#0a0a0b;border-color:var(--text)}
-#signIn:hover{background:#fff}
+#signIn{background:var(--grad);color:var(--on-accent);border-color:transparent}
+#signIn:hover,#save:hover,#saveName:hover{filter:brightness(1.1)}
 #signUp{background:transparent;color:var(--text)}
 #signUp:hover{border-color:var(--border-strong);background:var(--surface)}
-#save{background:var(--text);color:#0a0a0b;border-color:var(--text)}
-#save:hover{background:#fff}
+#save{background:var(--grad);color:var(--on-accent);border-color:transparent}
 #authBox{max-width:380px;margin:12vh auto 0;padding:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius)}
 #authBox h2{margin:0 0 6px;font-size:20px;font-weight:650;letter-spacing:-.02em}
 #authBox input{display:block;width:100%;margin:10px 0}
@@ -82,10 +87,10 @@ input:focus{border-color:var(--accent);outline:none}
 .namecard{width:100%;max-width:380px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:28px}
 .namecard h2{margin:0 0 6px;font-size:20px;font-weight:650;letter-spacing:-.02em}
 .namecard input{display:block;width:100%;margin:14px 0 10px}
-#saveName{background:var(--text);color:#0a0a0b;border:1px solid var(--text);border-radius:10px;padding:0 16px;min-height:42px;font-weight:600;font-size:14px}
+#saveName{background:var(--grad);color:var(--on-accent);border:1px solid transparent;border-radius:10px;padding:0 16px;min-height:42px;font-weight:600;font-size:14px}
 #nameMessage{color:var(--muted);font-size:13px;min-height:1em}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);display:none;z-index:50}
-#toast{background:var(--text);color:#0a0a0b;border-radius:999px;padding:10px 18px;font-size:13px;font-weight:600;box-shadow:0 8px 30px rgba(0,0,0,.5)}
+#toast{background:var(--grad);color:var(--on-accent);border-radius:999px;padding:10px 18px;font-size:13px;font-weight:600;box-shadow:0 8px 30px rgba(0,0,0,.5)}
 
 @media(max-width:480px){#games{grid-template-columns:minmax(0,1fr);padding:12px}.side{padding:16px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important}}
@@ -113,15 +118,19 @@ input:focus{border-color:var(--accent);outline:none}
 </div>
 
 <div id="appContent" style="display:none !important;">
-  <header>
-    <div class="eyebrow">FOURTH DOWN PICKS</div>
-    <h1>Pick. Compete. Win.</h1>
-    <div class="sub">Your group's weekly NFL prediction league.</div>
+  <header class="hdr">
+    <div>
+      <div class="eyebrow">FOURTH DOWN PICKS</div>
+      <h1>Pick. Compete. Win.</h1>
+      <div class="sub">Your group's weekly NFL prediction league.</div>
+    </div>
+    <img id="teamLogo" alt="" hidden>
   </header>
   <div class="wrap">
     <div class="top">
       <select id="player" class="control" aria-label="Player"></select>
       <select id="week" class="control" aria-label="Week"></select>
+      <select id="team" class="control" aria-label="Favorite team"></select>
       <button id="refresh" class="control">Refresh</button>
       <button id="save" class="control">Save</button>
       <button id="signOut" class="control">Sign out</button>
@@ -160,6 +169,67 @@ let started = false;
 let picks = JSON.parse(localStorage.getItem("fdPicks") || "{}"), events = [];
 
 const $ = id => document.getElementById(id);
+const TEAMS = {
+  ARI:["Arizona Cardinals","#d4304f","#ffb612"], ATL:["Atlanta Falcons","#e03a52","#c0c4c8"],
+  BAL:["Baltimore Ravens","#8a63ff","#d9a82e"], BUF:["Buffalo Bills","#2f6bff","#e0242a"],
+  CAR:["Carolina Panthers","#1aa3e8","#c0c4c8"], CHI:["Chicago Bears","#ff5a1f","#ff9a66"],
+  CIN:["Cincinnati Bengals","#fb4f14","#ff9a66"], CLE:["Cleveland Browns","#ff4d14","#c98a54"],
+  DAL:["Dallas Cowboys","#4d86d8","#b0b7bc"], DEN:["Denver Broncos","#fc4c02","#ff9a66"],
+  DET:["Detroit Lions","#1b9ae0","#c0c4c8"], GB:["Green Bay Packers","#ffb612","#3fb27a"],
+  HOU:["Houston Texans","#ee2a45","#ff6f84"], IND:["Indianapolis Colts","#2f7be0","#e6ecf5"],
+  JAX:["Jacksonville Jaguars","#00a3b8","#d7a22a"], KC:["Kansas City Chiefs","#ee2b47","#ffb612"],
+  LV:["Las Vegas Raiders","#c4cad2","#8f98a3"], LAC:["Los Angeles Chargers","#1fa3ee","#ffc20e"],
+  LAR:["Los Angeles Rams","#2f6ff0","#ffa300"], MIA:["Miami Dolphins","#00b5c0","#fc4c02"],
+  MIN:["Minnesota Vikings","#8a5cf0","#ffc62f"], NE:["New England Patriots","#e0233f","#b0b7bc"],
+  NO:["New Orleans Saints","#d3bc8d","#efe0b8"], NYG:["New York Giants","#3a78d8","#e0243f"],
+  NYJ:["New York Jets","#2da36b","#e6ecf5"], PHI:["Philadelphia Eagles","#05a89e","#c0c6cc"],
+  PIT:["Pittsburgh Steelers","#ffb612","#ffd25e"], SF:["San Francisco 49ers","#e0262f","#b3995d"],
+  SEA:["Seattle Seahawks","#69be28","#9ad85a"], TB:["Tampa Bay Buccaneers","#e3283f","#ff7a5a"],
+  TEN:["Tennessee Titans","#4b92db","#e0243f"], WSH:["Washington Commanders","#ffb612","#d8454c"]
+};
+const DEFAULT_THEME = ["#ff7a3d", "#ffb347"];
+let fav = "";
+
+const hexToRgb = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+const rgba = (h, a) => `rgba(${hexToRgb(h).join(",")},${a})`;
+function luminance(h) {
+  const [r, g, b] = hexToRgb(h).map(v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); });
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+function applyTheme(code) {
+  const [a, b] = TEAMS[code] ? [TEAMS[code][1], TEAMS[code][2]] : DEFAULT_THEME;
+  const st = document.documentElement.style;
+  st.setProperty("--accent", a);
+  st.setProperty("--accent-2", b);
+  st.setProperty("--accent-soft", rgba(a, 0.13));
+  st.setProperty("--accent-glow", rgba(a, 0.16));
+  st.setProperty("--accent-a35", rgba(a, 0.38));
+  st.setProperty("--accent-a55", rgba(a, 0.6));
+  st.setProperty("--grad", `linear-gradient(135deg,${a},${b})`);
+  st.setProperty("--on-accent", luminance(a) > 0.35 ? "#14110d" : "#ffffff");
+  const logo = $("teamLogo");
+  if (TEAMS[code]) {
+    logo.onerror = () => { logo.hidden = true; };
+    logo.src = `https://a.espncdn.com/i/teamlogos/nfl/500/${code.toLowerCase()}.png`;
+    logo.hidden = false;
+  } else {
+    logo.hidden = true;
+  }
+}
+function setTeam(code, save) {
+  fav = TEAMS[code] ? code : "";
+  $("team").value = fav;
+  applyTheme(fav);
+  localStorage.setItem("fdTeam", fav);
+  if (events.length) render();
+  if (save) sb.auth.updateUser({ data: { fav_team: fav } }).catch(e => console.error("Couldn't save team:", e));
+}
+$("team").innerHTML = '<option value="">Team colors</option>' +
+  Object.entries(TEAMS).sort((x, y) => x[1][0].localeCompare(y[1][0]))
+    .map(([k, v]) => `<option value="${k}">${v[0]}</option>`).join("");
+$("team").onchange = () => setTeam($("team").value, true);
+setTeam(localStorage.getItem("fdTeam") || "", false);
+
 const esc = s => String(s).replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
 
 async function loadMyPlayer() {
@@ -306,9 +376,9 @@ function render() {
   let count = 0;
   $("weekTitle").textContent = `Week ${w}`;
   $("games").innerHTML = gs.map(e => {
-    const t = teams(e), pk = picks[p]?.[e.id], over = locked(e), notMine = !!myPlayer && p !== myPlayer, isLocked = over || notMine;
+    const t = teams(e), pk = picks[p]?.[e.id], over = locked(e), notMine = !!myPlayer && p !== myPlayer, isLocked = over || notMine, favHit = !!fav && (t.a.abbreviation === fav || t.h.abbreviation === fav);
     if (pk) count++;
-    return `<div class="game"><div class="time">${fmt(e.date)} · ${e.status?.type?.shortDetail || ""}</div><div class="teams">
+    return `<div class="game ${favHit ? "fav" : ""}"><div class="time">${fmt(e.date)} · ${e.status?.type?.shortDetail || ""}</div><div class="teams">
       <button class="team ${pk === t.a.id ? "selected" : ""}" ${isLocked ? "disabled" : ""} onclick="choose('${e.id}','${t.a.id}')"><div class="abbr">${esc(t.a.abbreviation || "")}</div><div class="name">${esc(t.a.team.displayName)}</div></button>
       <div class="at">@</div>
       <button class="team home ${pk === t.h.id ? "selected" : ""}" ${isLocked ? "disabled" : ""} onclick="choose('${e.id}','${t.h.id}')"><div class="abbr">${esc(t.h.abbreviation || "")}</div><div class="name">${esc(t.h.team.displayName)}</div></button>
@@ -373,7 +443,7 @@ function updateBoard() {
   $("leaderboard").innerHTML = rows.map((x, i) => `
     <div class="player">
       <div style="display:flex;align-items:center;gap:12px">
-        <span style="width:16px;font-size:13px;font-weight:600;color:${i===0?"var(--text)":"var(--muted)"}">${i+1}</span>
+        <span style="width:16px;font-size:13px;font-weight:600;color:${i===0?"var(--accent)":"var(--muted)"}">${i+1}</span>
         <div>
           <div class="pname">${esc(x.p)}</div>
           <div class="small">${x.accuracy}% accuracy</div>
@@ -394,6 +464,10 @@ $("signOut").onclick = async () => { await sb.auth.signOut(); location.reload();
 $("save").onclick = () => { persist(); toast("Picks saved"); };
 
 async function startApp() {
+  try {
+    const { data: { user } } = await sb.auth.getUser();
+    setTeam(user?.user_metadata?.fav_team || "", false);
+  } catch (e) { console.error(e); }
   try { await loadMyPlayer(); } catch (e) { console.error("Player setup failed:", e); toast("Player setup failed: " + (e.message || e)); }
   try {
     await loadPlayers();
