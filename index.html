@@ -65,6 +65,14 @@ input:focus{border-color:var(--accent);outline:none}
 .odds b{color:var(--text);font-weight:600}
 .wp{display:flex;height:4px;border-radius:99px;overflow:hidden;background:var(--border-strong);margin-top:10px}
 .wp i{display:block;background:var(--grad)}
+.wknav{display:flex;align-items:center;gap:10px}
+.wk{width:34px;height:34px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:20px;line-height:1;padding:0 0 2px}
+.wk:hover:not(:disabled){border-color:var(--accent-a55);background:var(--surface-2)}
+#games{touch-action:pan-y}
+.slideL{animation:slideL .22s ease-out}
+.slideR{animation:slideR .22s ease-out}
+@keyframes slideL{from{transform:translateX(28px);opacity:0}to{transform:none;opacity:1}}
+@keyframes slideR{from{transform:translateX(-28px);opacity:0}to{transform:none;opacity:1}}
 .tabs{display:flex;align-items:center;gap:4px;padding:0 20px;border-bottom:1px solid var(--border)}
 .tab{background:none;border:0;border-bottom:2px solid transparent;color:var(--muted);padding:12px;font-weight:600;font-size:14px;margin-bottom:-1px}
 .tab:hover{color:var(--text)}
@@ -173,7 +181,7 @@ input:focus{border-color:var(--accent);outline:none}
     </div>
     <div class="grid">
       <div class="card">
-        <div class="head"><h2 id="weekTitle"></h2><span class="pill" id="picked"></span></div>
+        <div class="head"><div class="wknav"><button id="prevWeek" class="wk" aria-label="Previous week">‹</button><h2 id="weekTitle"></h2><button id="nextWeek" class="wk" aria-label="Next week">›</button></div><span class="pill" id="picked"></span></div>
         <div class="tabs">
           <button id="tabPicks" class="tab on">Picks</button>
           <button id="tabReveal" class="tab">Reveal</button>
@@ -464,6 +472,7 @@ function render() {
   if (view === "reveal") $("games").innerHTML = revealHTML(gs) || "<div style='padding:22px;color:var(--muted)'>No games this week.</div>";
   $("livePill").hidden = !events.some(e => gameState(e) === "in");
   $("oddsNote").hidden = !showOdds;
+  updateWeekNav();
   $("picked").textContent = `${count} / ${gs.length} picked`;
   updateBoard();
 }
@@ -625,6 +634,47 @@ function updateBoard() {
 
 $("player").onchange = () => { localStorage.setItem("fdCurrent", $("player").value); render(); };
 $("week").onchange = render;
+
+function weekIndex() {
+  const opts = [...$("week").options].map(o => o.value);
+  return { opts, i: opts.indexOf($("week").value) };
+}
+function updateWeekNav() {
+  const { opts, i } = weekIndex();
+  $("prevWeek").disabled = i <= 0;
+  $("nextWeek").disabled = i < 0 || i >= opts.length - 1;
+}
+function goWeek(delta) {
+  const { opts, i } = weekIndex();
+  const n = i + delta;
+  if (i < 0 || n < 0 || n >= opts.length) return;
+  $("week").value = opts[n];
+  render();
+  const g = $("games");
+  g.classList.remove("slideL", "slideR");
+  void g.offsetWidth;
+  g.classList.add(delta > 0 ? "slideL" : "slideR");
+}
+$("prevWeek").onclick = () => goWeek(-1);
+$("nextWeek").onclick = () => goWeek(1);
+
+const swipeCard = $("games").closest(".card");
+let sx = null, sy = null;
+swipeCard.addEventListener("touchstart", e => {
+  if (e.touches.length !== 1) { sx = null; return; }
+  sx = e.touches[0].clientX; sy = e.touches[0].clientY;
+}, { passive: true });
+swipeCard.addEventListener("touchend", e => {
+  if (sx === null) return;
+  const t = e.changedTouches[0], dx = t.clientX - sx, dy = t.clientY - sy;
+  sx = null;
+  if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) goWeek(dx < 0 ? 1 : -1);
+}, { passive: true });
+document.addEventListener("keydown", e => {
+  if (["INPUT", "SELECT", "TEXTAREA"].includes(document.activeElement?.tagName)) return;
+  if (e.key === "ArrowLeft") goWeek(-1);
+  if (e.key === "ArrowRight") goWeek(1);
+});
 const syncOddsBtn = () => { $("oddsToggle").textContent = "Odds: " + (showOdds ? "On" : "Off"); };
 $("oddsToggle").onclick = () => { showOdds = !showOdds; localStorage.setItem("fdOdds", showOdds ? "1" : "0"); syncOddsBtn(); render(); };
 syncOddsBtn();
