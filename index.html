@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0a0a0b">
 <title>Fourth Down Picks</title>
 <style>
 :root{
@@ -46,7 +47,14 @@ input:focus{border-color:var(--accent);outline:none}
 
 #games{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:12px;padding:16px}
 .game{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:14px;min-width:0}
-.game.fav{border-color:var(--accent-a55)}
+.game.fav{border-color:var(--accent-a55);box-shadow:inset 3px 0 0 var(--accent)}
+.hdr .sub::after{content:"";display:block;width:44px;height:3px;border-radius:99px;background:var(--grad);margin-top:12px}
+#teamLogo{filter:drop-shadow(0 0 14px var(--accent-a35))}
+.head{background:linear-gradient(90deg,var(--accent-soft),transparent 65%)}
+.sideTitle::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--accent);margin-right:8px;vertical-align:1px}
+.player.me{background:var(--accent-soft);box-shadow:inset 3px 0 0 var(--accent);border-radius:8px;padding-left:12px;border-bottom-color:transparent}
+::selection{background:var(--accent-a35)}
+:root{accent-color:var(--accent)}
 .time{color:var(--muted);font-size:12px;margin-bottom:12px}
 .teams{display:grid;grid-template-columns:minmax(0,1fr) 16px minmax(0,1fr);align-items:stretch;gap:6px}
 .team{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 6px;min-width:0;min-height:84px;text-align:center}
@@ -269,6 +277,10 @@ function luminance(h) {
   const [r, g, b] = hexToRgb(h).map(v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); });
   return 0.2126 * r + 0.7152 * g + 0.0722 * b;
 }
+function mixHex(h, t) {
+  const bg = [10, 10, 11], c = hexToRgb(h);
+  return "#" + bg.map((v, i) => Math.round(v + (c[i] - v) * t).toString(16).padStart(2, "0")).join("");
+}
 function applyTheme(code) {
   const [a, b] = TEAMS[code] ? [TEAMS[code][1], TEAMS[code][2]] : DEFAULT_THEME;
   const st = document.documentElement.style;
@@ -280,6 +292,7 @@ function applyTheme(code) {
   st.setProperty("--accent-a55", rgba(a, 0.6));
   st.setProperty("--grad", `linear-gradient(135deg,${a},${b})`);
   st.setProperty("--on-accent", luminance(a) > 0.35 ? "#14110d" : "#ffffff");
+  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", mixHex(a, 0.14));
   const logo = $("teamLogo");
   if (TEAMS[code]) {
     logo.onerror = () => { logo.hidden = true; };
@@ -616,7 +629,7 @@ function updateBoard() {
   }).sort((a, b) => b.correct - a.correct || b.accuracy - a.accuracy || a.p.localeCompare(b.p));
 
   $("leaderboard").innerHTML = rows.map((x, i) => `
-    <div class="player">
+    <div class="player ${x.p === myPlayer ? "me" : ""}">
       <div style="display:flex;align-items:center;gap:12px">
         <span style="width:16px;font-size:13px;font-weight:600;color:${i===0?"var(--accent)":"var(--muted)"}">${i+1}</span>
         <div>
