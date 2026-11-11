@@ -81,6 +81,9 @@ input:focus{border-color:var(--accent);outline:none}
 .slideR{animation:slideR .22s ease-out}
 @keyframes slideL{from{transform:translateX(28px);opacity:0}to{transform:none;opacity:1}}
 @keyframes slideR{from{transform:translateX(-28px);opacity:0}to{transform:none;opacity:1}}
+.seg{display:flex;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:3px;margin-bottom:10px}
+.seg button{flex:1;border:0;background:none;color:var(--muted);padding:7px 8px;border-radius:7px;font-size:13px;font-weight:600}
+.seg button.on{background:var(--surface-2);color:var(--text);box-shadow:inset 0 0 0 1px var(--accent-a35)}
 .tabs{display:flex;align-items:center;gap:4px;padding:0 20px;border-bottom:1px solid var(--border)}
 .tab{background:none;border:0;border-bottom:2px solid transparent;color:var(--muted);padding:12px;font-weight:600;font-size:14px;margin-bottom:-1px}
 .tab:hover{color:var(--text)}
@@ -201,6 +204,7 @@ input:focus{border-color:var(--accent);outline:none}
       <div class="card side">
         <div class="section">
           <div class="sideTitle">Leaderboard</div>
+          <div class="seg"><button id="lbWeek">This week</button><button id="lbAll">All time</button></div>
           <div id="leaderboard"></div>
         </div>
         <div class="section">
@@ -492,6 +496,7 @@ function render() {
 
 const LIVE_URL = "https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard";
 let view = "picks";
+let lbScope = localStorage.getItem("fdLb") === "all" ? "all" : "week";
 let pickRows = null;
 const gameState = e => e.status?.type?.state || "pre";
 const teamAbbr = (t, id) => id === t.a.id ? t.a.abbreviation : id === t.h.id ? t.h.abbreviation : null;
@@ -615,9 +620,14 @@ window.choose = async (id, team) => {
 };
 
 function updateBoard() {
+  const weekVal = +$("week").value;
+  const evs = lbScope === "week" ? events.filter(e => weekNo(e.date) === weekVal) : events;
+  $("lbWeek").textContent = weekVal ? "Week " + weekVal : "This week";
+  $("lbWeek").classList.toggle("on", lbScope === "week");
+  $("lbAll").classList.toggle("on", lbScope === "all");
   const rows = players.map(p => {
     let correct = 0, graded = 0;
-    events.forEach(e => {
+    evs.forEach(e => {
       const winner = e.competitions?.[0]?.competitors?.find(x => x.winner)?.id;
       const pick = picks[p]?.[e.id];
       if (locked(e) && winner && pick) {
@@ -668,6 +678,8 @@ function goWeek(delta) {
   void g.offsetWidth;
   g.classList.add(delta > 0 ? "slideL" : "slideR");
 }
+$("lbWeek").onclick = () => { lbScope = "week"; localStorage.setItem("fdLb", "week"); updateBoard(); };
+$("lbAll").onclick = () => { lbScope = "all"; localStorage.setItem("fdLb", "all"); updateBoard(); };
 $("prevWeek").onclick = () => goWeek(-1);
 $("nextWeek").onclick = () => goWeek(1);
 
