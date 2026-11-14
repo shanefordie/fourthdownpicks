@@ -84,6 +84,7 @@ input:focus{border-color:var(--accent);outline:none}
 .seg{display:flex;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:3px;margin-bottom:10px}
 .seg button{flex:1;border:0;background:none;color:var(--muted);padding:7px 8px;border-radius:7px;font-size:13px;font-weight:600}
 .seg button.on{background:var(--surface-2);color:var(--text);box-shadow:inset 0 0 0 1px var(--accent-a35)}
+.sportseg{width:190px;margin:22px 0 0}
 .tabs{display:flex;align-items:center;gap:4px;padding:0 20px;border-bottom:1px solid var(--border)}
 .tab{background:none;border:0;border-bottom:2px solid transparent;color:var(--muted);padding:12px;font-weight:600;font-size:14px;margin-bottom:-1px}
 .tab:hover{color:var(--text)}
@@ -181,6 +182,7 @@ input:focus{border-color:var(--accent);outline:none}
     <img id="teamLogo" alt="" hidden>
   </header>
   <div class="wrap">
+    <div class="seg sportseg" id="sportSeg"><button data-s="nfl">NFL</button><button data-s="nba">NBA</button></div>
     <div class="top">
       <select id="player" class="control" aria-label="Player"></select>
       <select id="week" class="control" aria-label="Week"></select>
@@ -231,7 +233,7 @@ let started = false;
 let picks = JSON.parse(localStorage.getItem("fdPicks") || "{}"), events = [];
 
 const $ = id => document.getElementById(id);
-const TEAMS = {
+const NFL_TEAMS = {
   ARI:["Arizona Cardinals","#d4304f","#ffb612"], ATL:["Atlanta Falcons","#e03a52","#c0c4c8"],
   BAL:["Baltimore Ravens","#8a63ff","#d9a82e"], BUF:["Buffalo Bills","#2f6bff","#e0242a"],
   CAR:["Carolina Panthers","#1aa3e8","#c0c4c8"], CHI:["Chicago Bears","#ff5a1f","#ff9a66"],
@@ -249,6 +251,31 @@ const TEAMS = {
   SEA:["Seattle Seahawks","#69be28","#9ad85a"], TB:["Tampa Bay Buccaneers","#e3283f","#ff7a5a"],
   TEN:["Tennessee Titans","#4b92db","#e0243f"], WSH:["Washington Commanders","#ffb612","#d8454c"]
 };
+const NBA_TEAMS = {
+  ATL:["Atlanta Hawks","#e8434a","#c4d600"], BOS:["Boston Celtics","#1fb364","#d4b06a"],
+  BKN:["Brooklyn Nets","#c4cad2","#8f98a3"], CHA:["Charlotte Hornets","#1fb0c8","#8a63ff"],
+  CHI:["Chicago Bulls","#e03a4a","#c4cad2"], CLE:["Cleveland Cavaliers","#d6405f","#fdbb30"],
+  DAL:["Dallas Mavericks","#3d87e8","#b0b7bc"], DEN:["Denver Nuggets","#fdb927","#4a90e2"],
+  DET:["Detroit Pistons","#e0243f","#3a78d8"], GS:["Golden State Warriors","#fdb927","#3a78d8"],
+  HOU:["Houston Rockets","#e0243f","#c4cad2"], IND:["Indiana Pacers","#fdbb30","#3a78d8"],
+  LAC:["LA Clippers","#e0384a","#4a90e2"], LAL:["Los Angeles Lakers","#8a5cf0","#fdb927"],
+  MEM:["Memphis Grizzlies","#5d9be0","#f5b100"], MIA:["Miami Heat","#e0243f","#f9a01b"],
+  MIL:["Milwaukee Bucks","#2fa86a","#eee1c6"], MIN:["Minnesota Timberwolves","#78be20","#4a90e2"],
+  NO:["New Orleans Pelicans","#d4a853","#e0384a"], NY:["New York Knicks","#3a78e0","#f58426"],
+  OKC:["Oklahoma City Thunder","#3aa0e8","#f08a3a"], ORL:["Orlando Magic","#3a8ee0","#c4cad2"],
+  PHI:["Philadelphia 76ers","#3a78e0","#e0243f"], PHX:["Phoenix Suns","#f08a3a","#8a5cf0"],
+  POR:["Portland Trail Blazers","#e0243f","#c4cad2"], SAC:["Sacramento Kings","#8a5cf0","#c4cad2"],
+  SA:["San Antonio Spurs","#c4cad2","#8f98a3"], TOR:["Toronto Raptors","#e0243f","#c4cad2"],
+  UTAH:["Utah Jazz","#f5d03b","#c4cad2"], WSH:["Washington Wizards","#e0243f","#3a78e0"]
+};
+const SPORTS = {
+  nfl: { label: "NFL", path: "football/nfl", teams: NFL_TEAMS },
+  nba: { label: "NBA", path: "basketball/nba", teams: NBA_TEAMS }
+};
+const SB = "https://site.api.espn.com/apis/site/v2/sports/";
+let sport = localStorage.getItem("fdSport") === "nba" ? "nba" : "nfl";
+let TEAMS = SPORTS[sport].teams;
+let userMeta = {};
 const DEFAULT_THEME = ["#ff7a3d", "#ffb347"];
 let fav = "";
 let showOdds = localStorage.getItem("fdOdds") !== "0";
@@ -300,7 +327,7 @@ function applyTheme(code) {
   const logo = $("teamLogo");
   if (TEAMS[code]) {
     logo.onerror = () => { logo.hidden = true; };
-    logo.src = `https://a.espncdn.com/i/teamlogos/nfl/500/${code.toLowerCase()}.png`;
+    logo.src = `https://a.espncdn.com/i/teamlogos/${SPORTS[sport].path.split("/")[1]}/500/${code.toLowerCase()}.png`;
     logo.hidden = false;
   } else {
     logo.hidden = true;
@@ -310,15 +337,21 @@ function setTeam(code, save) {
   fav = TEAMS[code] ? code : "";
   $("team").value = fav;
   applyTheme(fav);
-  localStorage.setItem("fdTeam", fav);
+  localStorage.setItem("fdTeam_" + sport, fav);
+  const key = sport === "nba" ? "fav_team_nba" : "fav_team";
+  userMeta[key] = fav;
   if (events.length) render();
-  if (save) sb.auth.updateUser({ data: { fav_team: fav } }).catch(e => console.error("Couldn't save team:", e));
+  if (save) sb.auth.updateUser({ data: { [key]: fav } }).catch(e => console.error("Couldn't save team:", e));
 }
-$("team").innerHTML = '<option value="">Team colors</option>' +
-  Object.entries(TEAMS).sort((x, y) => x[1][0].localeCompare(y[1][0]))
-    .map(([k, v]) => `<option value="${k}">${v[0]}</option>`).join("");
+const favFor = sp => userMeta[sp === "nba" ? "fav_team_nba" : "fav_team"] || "";
+function fillTeamSelect() {
+  $("team").innerHTML = '<option value="">Team colors</option>' +
+    Object.entries(TEAMS).sort((x, y) => x[1][0].localeCompare(y[1][0]))
+      .map(([k, v]) => `<option value="${k}">${v[0]}</option>`).join("");
+}
+fillTeamSelect();
 $("team").onchange = () => setTeam($("team").value, true);
-setTeam(localStorage.getItem("fdTeam") || "", false);
+setTeam(localStorage.getItem("fdTeam_" + sport) || (sport === "nfl" ? localStorage.getItem("fdTeam") : "") || "", false);
 
 const esc = s => String(s).replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
 
@@ -371,6 +404,33 @@ function toast(s) {
   $("toast").style.display = "block";
   setTimeout(() => $("toast").style.display = "none", 1500);
 }
+const pad = n => String(n).padStart(2, "0");
+const dayKey = d => { d = new Date(d); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; };
+const parseDay = k => { const [y, m, d] = k.split("-").map(Number); return new Date(y, m - 1, d); };
+const addDays = (k, n) => { const d = parseDay(k); d.setDate(d.getDate() + n); return dayKey(d); };
+const mondayOf = k => { const d = parseDay(k); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return dayKey(d); };
+const ymd = k => k.replace(/-/g, "");
+const fmtDay = k => new Intl.DateTimeFormat("en-US", { weekday: "short", month: "short", day: "numeric" }).format(parseDay(k));
+const isNba = () => sport === "nba";
+const periodOf = e => isNba() ? dayKey(e.date) : String(weekNo(e.date));
+const weekKeyOf = e => isNba() ? mondayOf(dayKey(e.date)) : String(weekNo(e.date));
+const selWeekKey = () => !$("week").value ? "" : isNba() ? mondayOf($("week").value) : String(+$("week").value);
+const periodLabel = v => isNba() ? fmtDay(v) : "Week " + v;
+function weekLabel() {
+  const v = $("week").value;
+  if (!v) return "This week";
+  if (!isNba()) return "Week " + v;
+  const a = parseDay(mondayOf(v)), b = parseDay(addDays(mondayOf(v), 6));
+  const f = d => new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(d);
+  return a.getMonth() === b.getMonth() ? f(a) + "–" + b.getDate() : f(a) + " – " + f(b);
+}
+function addEvents(list) {
+  const map = new Map(events.map(e => [e.id, e]));
+  list.filter(e => e.competitions?.[0]?.competitors?.length === 2).forEach(e => map.set(e.id, e));
+  events = [...map.values()];
+}
+const nbaLoaded = new Set();
+
 function weekNo(date) {
   const start = new Date("2026-09-09T00:00:00"), d = new Date(date);
   return Math.max(1, Math.floor((d - start) / 604800000) + 1);
@@ -399,60 +459,161 @@ function populatePlayers() {
   $("player").value = players.includes(current) ? current : players[0];
 }
 
-async function syncGamesToDatabase() {
-  const { data: weeks, error: weekError } = await sb.from("weeks").select("id, week_number");
-  if (weekError) throw weekError;
-  const weekIds = Object.fromEntries(weeks.map(w => [w.week_number, w.id]));
-  const rows = events.map(e => {
+async function syncGamesToDatabase(list, sp) {
+  let weekIds = {};
+  if (sp === "nfl") {
+    const { data: weeks, error: weekError } = await sb.from("weeks").select("id, week_number");
+    if (weekError) throw weekError;
+    weekIds = Object.fromEntries(weeks.map(w => [w.week_number, w.id]));
+  }
+  const rows = list.filter(e => e.competitions?.[0]?.competitors?.length === 2).map(e => {
     const t = teams(e);
     return {
       espn_event_id: e.id,
-      week_id: weekIds[weekNo(e.date)],
+      sport: sp,
+      week_id: sp === "nfl" ? weekIds[weekNo(e.date)] : null,
       home_team: t.h.team.displayName,
       away_team: t.a.team.displayName,
       kickoff_at: e.date
     };
-  }).filter(r => r.week_id);
-  if (!rows.length) return;
-  const { error } = await sb.from("games").upsert(rows, { onConflict: "espn_event_id" });
-  if (error) throw error;
+  }).filter(r => sp !== "nfl" || r.week_id);
+  for (let i = 0; i < rows.length; i += 500) {
+    const { error } = await sb.from("games").upsert(rows.slice(i, i + 500), { onConflict: "espn_event_id" });
+    if (error) throw error;
+  }
+}
+
+function buildNbaDays() {
+  const start = "2026-10-15", end = "2027-06-30", keep = $("week").value;
+  const days = [];
+  for (let k = start; k <= end; k = addDays(k, 1)) days.push(k);
+  $("week").innerHTML = days.map(k => `<option value="${k}">${fmtDay(k)}</option>`).join("");
+  const today = dayKey(new Date());
+  $("week").value = days.includes(keep) ? keep : days.includes(today) ? today : (today < start ? start : days[days.length - 1]);
+}
+async function fetchNbaWeek(mon) {
+  const url = k => SB + `basketball/nba/scoreboard?dates=${k}&limit=300`;
+  try {
+    const r = await fetch(url(ymd(addDays(mon, -1)) + "-" + ymd(addDays(mon, 7))));
+    const d = await r.json();
+    if (d.events?.length) return d.events;
+  } catch (e) { console.warn("NBA range fetch failed, trying day by day", e); }
+  const days = await Promise.all([-1, 0, 1, 2, 3, 4, 5, 6, 7].map(async i => {
+    try { const r = await fetch(url(ymd(addDays(mon, i)))); return (await r.json()).events || []; } catch { return []; }
+  }));
+  return days.flat();
+}
+async function ensureData() {
+  if (!isNba()) return;
+  const mon = $("week").value ? mondayOf($("week").value) : null;
+  if (!mon || nbaLoaded.has(mon)) return;
+  const evs = await fetchNbaWeek(mon);
+  if (!isNba()) return;
+  nbaLoaded.add(mon);
+  addEvents(evs);
+  try { await syncGamesToDatabase(evs, "nba"); }
+  catch (e) { console.error("Game sync failed:", e); toast("Game sync failed: " + (e.message || e)); }
+}
+let backfilling = false;
+async function backfillNba(gameRows, data) {
+  if (backfilling) return;
+  const ids = new Set(data.map(p => p.game_id));
+  const need = new Set(gameRows.filter(g => ids.has(g.id) && g.sport === "nba" && g.kickoff_at).map(g => mondayOf(dayKey(g.kickoff_at))));
+  const todo = [...need].filter(m => !nbaLoaded.has(m));
+  if (!todo.length) return;
+  backfilling = true;
+  try {
+    for (const mon of todo) {
+      if (!isNba()) break;
+      const evs = await fetchNbaWeek(mon);
+      nbaLoaded.add(mon);
+      addEvents(evs);
+    }
+  } catch (e) { console.error("NBA backfill failed:", e); }
+  backfilling = false;
+  if (isNba()) render();
 }
 
 async function load() {
-  $("games").innerHTML = "<div style='padding:22px;color:var(--muted)'>Loading the 2026 NFL schedule…</div>";
+  const sp = sport;
+  $("games").innerHTML = `<div style='padding:22px;color:var(--muted)'>Loading the ${sp === "nba" ? "NBA" : "2026 NFL"} schedule…</div>`;
   try {
-    const r = await fetch("https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?dates=2026&seasontype=2&limit=500");
-    const d = await r.json();
-    events = d.events || [];
-
-    syncGamesToDatabase()
-      .catch(e => { console.error("Game sync failed:", e); toast("Game sync failed: " + (e.message || e)); })
-      .finally(() => loadSharedPicks());
-
-    const ws = [...new Set(events.map(e => weekNo(e.date)))].sort((a, b) => a - b);
-    $("week").innerHTML = ws.map(w => `<option value="${w}">Week ${w}</option>`).join("");
-    const current = Math.max(1, Math.min(18, weekNo(new Date())));
-    $("week").value = ws.includes(current) ? current : ws[0];
+    if (sp === "nfl") {
+      const r = await fetch(SB + "football/nfl/scoreboard?dates=2026&seasontype=2&limit=500");
+      const d = await r.json();
+      if (sp !== sport) return;
+      events = (d.events || []).filter(e => (e.season?.year ?? 2026) === 2026);
+      syncGamesToDatabase(events, "nfl")
+        .catch(e => { console.error("Game sync failed:", e); toast("Game sync failed: " + (e.message || e)); })
+        .finally(() => loadSharedPicks());
+      const ws = [...new Set(events.map(e => weekNo(e.date)))].sort((a, b) => a - b);
+      $("week").innerHTML = ws.map(w => `<option value="${w}">Week ${w}</option>`).join("");
+      const current = Math.max(1, Math.min(18, weekNo(new Date())));
+      $("week").value = ws.includes(current) ? current : ws[0];
+    } else {
+      events = [];
+      nbaLoaded.clear();
+      buildNbaDays();
+      await ensureData();
+      if (sp !== sport) return;
+      loadSharedPicks();
+    }
     render();
   } catch (e) {
+    console.error("Schedule load failed:", e);
     $("games").innerHTML = "<div style='padding:22px'>Schedule could not be loaded. Press Refresh.</div>";
   }
 }
 
-async function loadSharedPicks() {
-  let data = [];
-  for (let from = 0; ; from += 1000) {
-    const { data: page, error } = await sb.from("picks").select("player_id, game_id, selected_team").range(from, from + 999);
-    if (error) { console.error("Shared picks failed to load:", error); toast("Couldn't load shared picks: " + error.message); return; }
-    data = data.concat(page);
-    if (page.length < 1000) break;
+async function setSport(sp) {
+  if (sp === sport) return;
+  sport = sp;
+  localStorage.setItem("fdSport", sp);
+  TEAMS = SPORTS[sp].teams;
+  events = [];
+  fillTeamSelect();
+  setTeam(favFor(sp) || localStorage.getItem("fdTeam_" + sp) || "", false);
+  syncSportSeg();
+  await load();
+}
+function syncSportSeg() {
+  document.querySelectorAll("#sportSeg button").forEach(b => b.classList.toggle("on", b.dataset.s === sport));
+}
+
+async function changePeriod() {
+  if (isNba() && $("week").value && !nbaLoaded.has(mondayOf($("week").value))) {
+    $("games").innerHTML = "<div style='padding:22px;color:var(--muted)'>Loading games…</div>";
+    try { await ensureData(); } catch (e) { console.error(e); }
   }
+  render();
+}
 
-  const { data: playerRows, error: playerError } = await sb.from("players").select("id, display_name");
-  if (playerError) { console.error("Players failed to load:", playerError); return; }
+async function fetchAll(table, cols, orders) {
+  let out = [];
+  for (let from = 0; ; from += 1000) {
+    let q = sb.from(table).select(cols);
+    orders.forEach(o => { q = q.order(o); });
+    const { data, error } = await q.range(from, from + 999);
+    if (error) throw error;
+    out = out.concat(data);
+    if (data.length < 1000) break;
+  }
+  return out;
+}
 
-  const { data: gameRows, error: gameError } = await sb.from("games").select("id, espn_event_id");
-  if (gameError) { console.error("Games failed to load:", gameError); return; }
+async function loadSharedPicks() {
+  let data, playerRows, gameRows;
+  try {
+    data = await fetchAll("picks", "player_id, game_id, selected_team", ["game_id", "player_id"]);
+    const pr = await sb.from("players").select("id, display_name");
+    if (pr.error) throw pr.error;
+    playerRows = pr.data;
+    gameRows = await fetchAll("games", "id, espn_event_id, kickoff_at, sport", ["espn_event_id"]);
+  } catch (error) {
+    console.error("Shared picks failed to load:", error);
+    toast("Couldn't load shared picks: " + (error.message || error));
+    return;
+  }
 
   const playerNames = Object.fromEntries(playerRows.map(p => [p.id, p.display_name]));
   const eventIds = Object.fromEntries(gameRows.map(g => [g.id, g.espn_event_id]));
@@ -468,13 +629,15 @@ async function loadSharedPicks() {
   pickRows = data.length;
   picks = shared;
   render();
+  if (isNba()) backfillNba(gameRows, data);
 }
 
 function render() {
-  const p = $("player").value, w = +$("week").value;
-  const gs = events.filter(e => weekNo(e.date) === w).sort((a, b) => new Date(a.date) - new Date(b.date));
+  const p = $("player").value, w = $("week").value;
+  const noneHtml = `<div style='padding:22px;color:var(--muted)'>${isNba() ? "No games on this day." : "No games this week."}</div>`;
+  const gs = events.filter(e => periodOf(e) === w).sort((a, b) => new Date(a.date) - new Date(b.date));
   let count = 0;
-  $("weekTitle").textContent = `Week ${w}`;
+  $("weekTitle").textContent = w ? periodLabel(w) : "";
   $("games").innerHTML = gs.map(e => {
     const t = teams(e), pk = picks[p]?.[e.id], over = locked(e), notMine = !!myPlayer && p !== myPlayer, isLocked = over || notMine, favHit = !!fav && (t.a.abbreviation === fav || t.h.abbreviation === fav), started = gameState(e) !== "pre", live = gameState(e) === "in";
     const od = showOdds ? oddsInfo(e) : null;
@@ -485,8 +648,8 @@ function render() {
       <div class="at">@</div>
       <button class="team home ${pk === t.h.id ? "selected" : ""}" ${isLocked ? "disabled" : ""} onclick="choose('${e.id}','${t.h.id}')">${logoImg(t.h.team, "tlogo")}<div class="abbr">${esc(t.h.abbreviation || "")}</div><div class="name">${esc(t.h.team.displayName)}</div>${started ? `<div class="tscore">${t.h.score ?? 0}</div>` : ""}${od && od.ph != null ? `<div class="pct">${od.ph}%</div>` : ""}</button>
       </div>${oddsRow}<div class="lock">${over ? "🔒 Picks locked" + pickStatus(e, t, pk) : notMine ? "Viewing " + esc(p) + "'s picks" : pk ? "✓ Pick saved" : "Tap a team to pick the winner"}</div></div>`;
-  }).join("") || "<div style='padding:22px;color:var(--muted)'>No games this week.</div>";
-  if (view === "reveal") $("games").innerHTML = revealHTML(gs) || "<div style='padding:22px;color:var(--muted)'>No games this week.</div>";
+  }).join("") || noneHtml;
+  if (view === "reveal") $("games").innerHTML = revealHTML(gs) || noneHtml;
   $("livePill").hidden = !events.some(e => gameState(e) === "in");
   $("oddsNote").hidden = !showOdds;
   updateWeekNav();
@@ -494,7 +657,6 @@ function render() {
   updateBoard();
 }
 
-const LIVE_URL = "https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard";
 let view = "picks";
 let lbScope = localStorage.getItem("fdLb") === "all" ? "all" : "week";
 let pickRows = null;
@@ -558,8 +720,10 @@ function hasLive() {
 async function refreshLive() {
   try {
     const before = events.filter(locked).length;
-    const r = await fetch(LIVE_URL);
+    const sp = sport;
+    const r = await fetch(SB + SPORTS[sp].path + "/scoreboard");
     const d = await r.json();
+    if (sp !== sport) return;
     const byId = Object.fromEntries((d.events || []).map(e => [e.id, e]));
     events = events.map(e => byId[e.id] || e);
     render();
@@ -620,9 +784,9 @@ window.choose = async (id, team) => {
 };
 
 function updateBoard() {
-  const weekVal = +$("week").value;
-  const evs = lbScope === "week" ? events.filter(e => weekNo(e.date) === weekVal) : events;
-  $("lbWeek").textContent = weekVal ? "Week " + weekVal : "This week";
+  const wk = selWeekKey();
+  const evs = lbScope === "week" ? events.filter(e => weekKeyOf(e) === wk) : events;
+  $("lbWeek").textContent = weekLabel();
   $("lbWeek").classList.toggle("on", lbScope === "week");
   $("lbAll").classList.toggle("on", lbScope === "all");
   const rows = players.map(p => {
@@ -656,7 +820,7 @@ function updateBoard() {
 }
 
 $("player").onchange = () => { localStorage.setItem("fdCurrent", $("player").value); render(); };
-$("week").onchange = render;
+$("week").onchange = changePeriod;
 
 function weekIndex() {
   const opts = [...$("week").options].map(o => o.value);
@@ -672,7 +836,7 @@ function goWeek(delta) {
   const n = i + delta;
   if (i < 0 || n < 0 || n >= opts.length) return;
   $("week").value = opts[n];
-  render();
+  changePeriod();
   const g = $("games");
   g.classList.remove("slideL", "slideR");
   void g.offsetWidth;
@@ -704,13 +868,16 @@ const syncOddsBtn = () => { $("oddsToggle").textContent = "Odds: " + (showOdds ?
 $("oddsToggle").onclick = () => { showOdds = !showOdds; localStorage.setItem("fdOdds", showOdds ? "1" : "0"); syncOddsBtn(); render(); };
 syncOddsBtn();
 $("refresh").onclick = load;
+document.querySelectorAll("#sportSeg button").forEach(b => { b.onclick = () => setSport(b.dataset.s); });
+syncSportSeg();
 $("signOut").onclick = async () => { await sb.auth.signOut(); location.reload(); };
 $("save").onclick = () => { persist(); toast("Picks saved"); };
 
 async function startApp() {
   try {
     const { data: { user } } = await sb.auth.getUser();
-    setTeam(user?.user_metadata?.fav_team || "", false);
+    userMeta = user?.user_metadata || {};
+    setTeam(favFor(sport), false);
   } catch (e) { console.error(e); }
   try { await loadMyPlayer(); } catch (e) { console.error("Player setup failed:", e); toast("Player setup failed: " + (e.message || e)); }
   try {
